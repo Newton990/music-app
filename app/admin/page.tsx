@@ -26,7 +26,7 @@ export default function AdminDashboardPage() {
 
   // Stats
   const totalRevenue = payments
-    .filter((p) => p.status === "completed")
+    .filter((p) => p.status === "success")
     .reduce((sum, p) => sum + p.amount, 0);
   
   const ticketsSold = bookings
