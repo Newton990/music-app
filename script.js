@@ -1,268 +1,457 @@
-// Jamendo API Configuration
-const JAMENDO_CLIENT_ID = '56d30cce'; // More reliable test client ID
-const API_BASE_URL = 'https://api.jamendo.com/v3.0';
+// ============================================
+// NMstream – v1.5  (CORS Proxy + fetch)
+// ============================================
 
+const JAMENDO_CLIENT_ID = '56d30cce';
+const JAMENDO_BASE      = 'https://api.jamendo.com/v3.0/tracks/';
+const CORS_PROXY        = 'https://corsproxy.io/?';
+const ROW_LIMIT         = 20;
 
-// State
-let tracks = [];
-let currentTrack = null;
-let isPlaying = false;
-let currentGenre = 'all';
-
-// Pages
-const homePage = document.getElementById('homePage');
-const submitPage = document.getElementById('submitPage');
-const proPage = document.getElementById('proPage');
-const supportPage = document.getElementById('supportPage');
-const donatePage = document.getElementById('donatePage');
-
-// Nav Links
-const navLinks = [
-    { id: 'navHome', page: homePage },
-    { id: 'navSearch', page: homePage },
-    { id: 'navSubmit', page: submitPage },
-    { id: 'navPro', page: proPage },
-    { id: 'navSupport', page: supportPage },
-    { id: 'navDonate', page: donatePage }
+// Genre rows shown on the home page
+const DISCOVERY_GENRES = [
+    { tag: '',           label: '🔥 Trending Now'      },
+    { tag: 'pop',        label: '🎤 Pop Hits'          },
+    { tag: 'rock',       label: '🎸 Rock Anthems'      },
+    { tag: 'jazz',       label: '🎷 Jazz Vibes'        },
+    { tag: 'lofi',       label: '☕ Lofi Chill'        },
+    { tag: 'hiphop',     label: '🎧 Hip-Hop'           },
+    { tag: 'electronic', label: '⚡ Electronic / EDM'  },
+    { tag: 'ambient',    label: '🌙 Ambient / Relax'   },
+    { tag: 'classical',  label: '🎻 Classical'          },
+    { tag: 'reggae',     label: '🌴 Reggae'            },
 ];
 
-// Audio Elements
-const mainAudio = document.getElementById('mainAudio');
-const playPauseBtn = document.getElementById('playPauseBtn');
-const progressFill = document.getElementById('progressFill');
-const progressBar = document.getElementById('progressBar');
-const currentTimeEl = document.getElementById('currentTime');
-const durationEl = document.getElementById('duration');
+// App state
+let tracks       = [];
+let currentTrack = null;
+let isPlaying    = false;
 
-// Initialize App
-function initApp() {
-    fetchTracks(); // Initial fetch
-    setupNavigation();
-    setupAudioPlayer();
-    setupForms();
-    setupSearch();
+// ============================================
+// HELPERS
+// ============================================
+const getEl = id => document.getElementById(id);
+
+function buildJamendoUrl(tag = '', query = '', limit = ROW_LIMIT, offset = 0) {
+    let url = `${JAMENDO_BASE}?client_id=${JAMENDO_CLIENT_ID}`
+            + `&format=json&limit=${limit}&offset=${offset}`
+            + `&include=musicinfo&imagesize=400&order=popularity_total`;
+    if (tag)   url += `&tags=${encodeURIComponent(tag)}`;
+    if (query) url += `&search=${encodeURIComponent(query)}`;
+    return url;
 }
 
-async function fetchTracks(query = '', genre = 'all') {
-    const grid = document.getElementById('musicGrid');
-    grid.innerHTML = '<div class="loading">Loading fresh tracks...</div>';
-    
-    let url = `${API_BASE_URL}/tracks/?client_id=${JAMENDO_CLIENT_ID}&format=json&limit=24&include=musicinfo&imagesize=400&order=popularity_week`;
-
-    
-    if (query) {
-        url += `&search=${encodeURIComponent(query)}`;
-    }
-    
-    if (genre !== 'all') {
-        url += `&tags=${encodeURIComponent(genre)}`;
-    }
-
-    console.log('Fetching music from:', url);
+async function jamendoFetch(tag = '', query = '', limit = ROW_LIMIT, offset = 0) {
+    const apiUrl   = buildJamendoUrl(tag, query, limit, offset);
+    const proxyUrl = CORS_PROXY + encodeURIComponent(apiUrl);
 
     try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log('API Response:', data);
-        
-        if (data.results && data.results.length > 0) {
-            tracks = data.results.map(item => ({
-                id: item.id,
-                title: item.name,
-                artist: item.artist_name,
-                genre: item.musicinfo?.genre || 'Various',
-                cover: item.image || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop',
-                url: item.audio
-            }));
-            renderTracks(tracks);
-        } else {
-            console.warn('No tracks found for query:', query);
-            grid.innerHTML = '<div class="no-results">No tracks found. Try a broader search like "lofi" or "rock"!</div>';
-        }
-    } catch (error) {
-        console.error('Fetch Error:', error);
-        grid.innerHTML = `
-            <div class="error">
-                <i class="fas fa-exclamation-triangle"></i>
-                <p>Failed to load music.</p>
-                <small>Reason: ${error.message}</small>
-                <br>
-                <button onclick="fetchTracks()" class="retry-btn">Retry</button>
-            </div>
-        `;
+        const res = await fetch(proxyUrl);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        return data.results || [];
+    } catch (err) {
+        console.error('Jamendo fetch failed:', err);
+        return null;   // null = network error
     }
 }
 
+function mapTrack(item) {
+    return {
+        id:     item.id,
+        title:  item.name,
+        artist: item.artist_name,
+        cover:  item.image || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop',
+        url:    item.audio
+    };
+}
 
-function renderTracks(data) {
-    const grid = document.getElementById('musicGrid');
-    grid.innerHTML = '';
-    
-    data.forEach(track => {
+// ============================================
+// INIT
+// ============================================
+function initApp() {
+    setupNavigation();
+    setupAudioPlayer();
+    setupSearch();
+    setupForms();
+    buildDiscoveryRows();
+}
+
+// ============================================
+// DISCOVERY – horizontal genre rows
+// ============================================
+function buildDiscoveryRows() {
+    const container = getEl('genreRows');
+    if (!container) return;
+    container.innerHTML = '';
+    tracks = [];
+
+    DISCOVERY_GENRES.forEach((genre, i) => {
+        // Skeleton row
+        const row = document.createElement('div');
+        row.className = 'genre-row';
+        row.innerHTML = `
+            <div class="genre-row-header">
+                <h3 class="genre-row-title">${genre.label}</h3>
+            </div>
+            <div class="genre-row-scroll" id="rowScroll-${i}">
+                <div class="loading-row"><i class="fas fa-spinner fa-spin"></i> Loading…</div>
+            </div>`;
+        container.appendChild(row);
+
+        // Stagger requests so we don't overload the proxy
+        setTimeout(() => loadGenreRow(genre.tag, i), i * 400);
+    });
+}
+
+async function loadGenreRow(tag, index) {
+    const scroll = getEl(`rowScroll-${index}`);
+    if (!scroll) return;
+
+    const results = await jamendoFetch(tag);
+
+    if (results === null) {
+        scroll.innerHTML = '<div class="no-results">⚠️ Could not load – check your internet connection.</div>';
+        return;
+    }
+    if (results.length === 0) {
+        scroll.innerHTML = '<div class="no-results">No tracks found for this genre.</div>';
+        return;
+    }
+
+    scroll.innerHTML = '';
+    results.forEach(item => {
+        const track = mapTrack(item);
+        tracks.push(track);
+        scroll.appendChild(buildHCard(track));
+    });
+}
+
+function buildHCard(track) {
+    const card = document.createElement('div');
+    card.className = `track-card-h ${currentTrack?.id === track.id ? 'active' : ''}`;
+    card.innerHTML = `
+        <div class="card-img-container">
+            <img src="${track.cover}" alt="${track.title}" loading="lazy"
+                 onerror="this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop'">
+            <div class="play-overlay"><i class="fas fa-play"></i></div>
+        </div>
+        <div class="track-info">
+            <h3 title="${track.title}">${track.title}</h3>
+            <p title="${track.artist}">${track.artist}</p>
+        </div>`;
+    card.onclick = () => selectTrack(track);
+    return card;
+}
+
+// ============================================
+// SEARCH – flat grid
+// ============================================
+let searchDebounce;
+
+function setupSearch() {
+    const input = getEl('musicSearch');
+    if (!input) return;
+
+    input.addEventListener('input', e => {
+        clearTimeout(searchDebounce);
+        const q = e.target.value.trim();
+        if (!q) { buildDiscoveryRows(); return; }
+
+        searchDebounce = setTimeout(() => doSearch(q), 600);
+    });
+}
+
+async function doSearch(query) {
+    const container = getEl('genreRows');
+    if (!container) return;
+    container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Searching…</div>';
+
+    const results = await jamendoFetch('', query, 40);
+
+    if (results === null) {
+        container.innerHTML = '<div class="error"><p>⚠️ Search failed. Check your connection.</p></div>';
+        return;
+    }
+    if (results.length === 0) {
+        container.innerHTML = '<div class="no-results">No songs matched your search.</div>';
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="genre-row">
+            <div class="genre-row-header">
+                <h3 class="genre-row-title">🔍 Search Results (${results.length})</h3>
+            </div>
+            <div class="music-grid" id="searchGrid"></div>
+        </div>`;
+
+    const grid = getEl('searchGrid');
+    results.forEach(item => {
+        const track = mapTrack(item);
+        tracks.push(track);
         const card = document.createElement('div');
         card.className = `track-card ${currentTrack?.id === track.id ? 'active' : ''}`;
         card.innerHTML = `
             <div class="card-img-container">
-                <img src="${track.cover}" alt="${track.title}">
+                <img src="${track.cover}" alt="${track.title}" loading="lazy"
+                     onerror="this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop'">
                 <div class="play-overlay"><i class="fas fa-play"></i></div>
             </div>
             <div class="track-info">
                 <h3 title="${track.title}">${track.title}</h3>
                 <p title="${track.artist}">${track.artist}</p>
-            </div>
-        `;
+            </div>`;
         card.onclick = () => selectTrack(track);
         grid.appendChild(card);
     });
 }
 
+// ============================================
+// NAVIGATION
+// ============================================
 function setupNavigation() {
-    navLinks.forEach(linkObj => {
-        const el = document.getElementById(linkObj.id);
-        if (el) {
-            el.onclick = (e) => {
-                e.preventDefault();
-                [homePage, submitPage, proPage, supportPage, donatePage].forEach(p => p.style.display = 'none');
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                
-                linkObj.page.style.display = 'block';
-                el.classList.add('active');
-                window.scrollTo(0, 0);
+    const pageMap = {
+        navHome:    'homePage',
+        navSearch:  'homePage',
+        navSubmit:  'submitPage',
+        navPro:     'proPage',
+        navSupport: 'supportPage',
+        navDonate:  'donatePage'
+    };
+    const allPages = Object.values({ ...pageMap, extra: 'donatePage' });
+    const uniquePages = [...new Set(Object.values(pageMap))];
 
-                if (linkObj.id === 'navSearch') {
-                    document.getElementById('musicSearch').focus();
-                }
-            };
-        }
+    Object.entries(pageMap).forEach(([navId, pageId]) => {
+        const link = getEl(navId);
+        const page = getEl(pageId);
+        if (!link || !page) return;
+
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            uniquePages.forEach(id => { const p = getEl(id); if (p) p.style.display = 'none'; });
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            page.style.display = 'block';
+            link.classList.add('active');
+
+            if (navId === 'navHome') {
+                const s = getEl('musicSearch');
+                if (s) s.value = '';
+                buildDiscoveryRows();
+            } else if (navId === 'navSearch') {
+                getEl('musicSearch')?.focus();
+            }
+            window.scrollTo(0, 0);
+        });
     });
 
-    // Genre Bar
-    document.getElementById('genreBar').onclick = (e) => {
-        if (e.target.classList.contains('genre-btn')) {
-            document.querySelectorAll('.genre-btn').forEach(btn => btn.classList.remove('active'));
-            e.target.classList.add('active');
-            currentGenre = e.target.dataset.genre;
-            fetchTracks('', currentGenre);
-        }
-    };
+    // Genre bar filter
+    const genreBar = getEl('genreBar');
+    if (genreBar) {
+        genreBar.addEventListener('click', async e => {
+            const btn = e.target.closest('.genre-btn');
+            if (!btn) return;
+            document.querySelectorAll('.genre-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const tag       = btn.dataset.genre === 'all' ? '' : btn.dataset.genre;
+            const container = getEl('genreRows');
+            if (container) {
+                container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading…</div>';
+            }
+
+            const results = await jamendoFetch(tag, '', 60);
+            if (!container) return;
+
+            if (!results || results.length === 0) {
+                container.innerHTML = '<div class="no-results">No tracks found.</div>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="genre-row">
+                    <div class="genre-row-header">
+                        <h3 class="genre-row-title">${btn.textContent}</h3>
+                    </div>
+                    <div class="music-grid" id="filterGrid"></div>
+                </div>`;
+
+            const grid = getEl('filterGrid');
+            results.forEach(item => {
+                const track = mapTrack(item);
+                tracks.push(track);
+                const card = document.createElement('div');
+                card.className = `track-card ${currentTrack?.id === track.id ? 'active' : ''}`;
+                card.innerHTML = `
+                    <div class="card-img-container">
+                        <img src="${track.cover}" alt="${track.title}" loading="lazy"
+                             onerror="this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop'">
+                        <div class="play-overlay"><i class="fas fa-play"></i></div>
+                    </div>
+                    <div class="track-info">
+                        <h3 title="${track.title}">${track.title}</h3>
+                        <p title="${track.artist}">${track.artist}</p>
+                    </div>`;
+                card.onclick = () => selectTrack(track);
+                grid.appendChild(card);
+            });
+        });
+    }
 }
 
-function setupSearch() {
-    const searchInput = document.getElementById('musicSearch');
-    let debounceTimer;
-
-    searchInput.oninput = (e) => {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            fetchTracks(e.target.value, currentGenre);
-        }, 500);
-    };
-}
-
-function setupForms() {
-    document.getElementById('artistForm').onsubmit = (e) => {
-        e.preventDefault();
-        showNotification('Success! Your track has been submitted for review.');
-        e.target.reset();
-    };
-
-    document.getElementById('contactForm').onsubmit = (e) => {
-        e.preventDefault();
-        showNotification('Thank you! Your message has been sent.');
-        e.target.reset();
-    };
-
-    document.querySelectorAll('.donate-opt').forEach(opt => {
-        opt.onclick = () => {
-            document.querySelectorAll('.donate-opt').forEach(o => o.classList.remove('active'));
-            opt.classList.add('active');
-        };
-    });
-}
-
+// ============================================
+// AUDIO PLAYER
+// ============================================
 function setupAudioPlayer() {
-    playPauseBtn.onclick = togglePlay;
+    const playBtn     = getEl('playPauseBtn');
+    const audio       = getEl('mainAudio');
+    const progressBar = getEl('progressBar');
+    const downloadBtn = getEl('downloadBtn');
+    const featPlay    = getEl('playFeatured');
+    const followBtn   = document.querySelector('.btn-follow');
 
-    mainAudio.ontimeupdate = () => {
-        const percent = (mainAudio.currentTime / mainAudio.duration) * 100;
-        progressFill.style.width = `${percent}%`;
-        currentTimeEl.textContent = formatTime(mainAudio.currentTime);
-        if (mainAudio.duration) durationEl.textContent = formatTime(mainAudio.duration);
-    };
+    if (playBtn) playBtn.addEventListener('click', togglePlay);
 
-    progressBar.onclick = (e) => {
-        const width = progressBar.clientWidth;
-        const clickX = e.offsetX;
-        mainAudio.currentTime = (clickX / width) * mainAudio.duration;
-    };
+    if (audio) {
+        audio.addEventListener('timeupdate', () => {
+            const pct  = (audio.currentTime / audio.duration) * 100 || 0;
+            const fill = getEl('progressFill');
+            const cur  = getEl('currentTime');
+            const dur  = getEl('duration');
+            if (fill) fill.style.width = `${pct}%`;
+            if (cur)  cur.textContent  = formatTime(audio.currentTime);
+            if (dur && audio.duration) dur.textContent = formatTime(audio.duration);
+        });
+        audio.addEventListener('ended', pauseTrack);
+    }
 
-    document.getElementById('downloadBtn').onclick = () => {
-        if (!currentTrack) {
-            showNotification('Please select a track first!', 'warning');
-            return;
-        }
-        showNotification(`Downloading ${currentTrack.title}...`);
-        const link = document.createElement('a');
-        link.href = currentTrack.url;
-        link.download = `${currentTrack.title}.mp3`;
-        link.target = '_blank'; // Open in new tab for direct audio links
-        link.click();
-    };
+    if (progressBar && audio) {
+        progressBar.addEventListener('click', e => {
+            if (!isNaN(audio.duration)) {
+                audio.currentTime = (e.offsetX / progressBar.clientWidth) * audio.duration;
+            }
+        });
+    }
+
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => {
+            if (!currentTrack) { showNotification('Select a track first!', 'warning'); return; }
+            window.open(currentTrack.url, '_blank');
+        });
+    }
+
+    if (featPlay) {
+        featPlay.addEventListener('click', () => {
+            if (tracks.length > 0) selectTrack(tracks[0]);
+            else showNotification('Music is still loading, please wait…', 'warning');
+        });
+    }
+
+    if (followBtn) {
+        followBtn.addEventListener('click', () => {
+            followBtn.innerHTML = '<i class="fas fa-check"></i> Following';
+            followBtn.style.background = 'rgba(125,95,255,0.5)';
+        });
+    }
+
+    // Pro badge → Pro page
+    const proBadge = document.querySelector('.pro-badge');
+    if (proBadge) {
+        proBadge.addEventListener('click', () => {
+            ['homePage','submitPage','proPage','supportPage','donatePage'].forEach(id => {
+                const p = getEl(id); if (p) p.style.display = 'none';
+            });
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            const pro = getEl('proPage'); if (pro) pro.style.display = 'block';
+        });
+    }
 }
 
+// ============================================
+// TRACK SELECTION & PLAYBACK
+// ============================================
 function selectTrack(track) {
+    const audio = getEl('mainAudio');
+    if (!audio) return;
     currentTrack = track;
-    mainAudio.src = track.url;
-    document.getElementById('playerTrackImg').src = track.cover;
-    document.getElementById('playerTrackTitle').textContent = track.title;
-    document.getElementById('playerTrackArtist').textContent = track.artist;
-    
-    // Refresh grid to show active state
-    renderTracks(tracks);
+    audio.src    = track.url;
+
+    const img    = getEl('playerTrackImg');
+    const title  = getEl('playerTrackTitle');
+    const artist = getEl('playerTrackArtist');
+    if (img)    img.src            = track.cover;
+    if (title)  title.textContent  = track.title;
+    if (artist) artist.textContent = track.artist;
+
+    document.querySelectorAll('.track-card, .track-card-h').forEach(c => c.classList.remove('active'));
     playTrack();
 }
 
-function togglePlay() {
-    if (isPlaying) pauseTrack();
-    else playTrack();
-}
+function togglePlay() { if (isPlaying) pauseTrack(); else playTrack(); }
 
 function playTrack() {
-    if (!currentTrack) return;
+    const audio   = getEl('mainAudio');
+    const playBtn = getEl('playPauseBtn');
+    if (!audio || !currentTrack) return;
     isPlaying = true;
-    mainAudio.play().catch(err => {
-        console.error('Audio play failed:', err);
-        showNotification('Failed to play track. It might be blocked or unavailable.', 'error');
-    });
-    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    audio.play().catch(() => showNotification('Click any song to start playing.', 'warning'));
+    if (playBtn) playBtn.innerHTML = '<i class="fas fa-pause"></i>';
 }
 
 function pauseTrack() {
+    const audio   = getEl('mainAudio');
+    const playBtn = getEl('playPauseBtn');
     isPlaying = false;
-    mainAudio.pause();
-    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+    if (audio)   audio.pause();
+    if (playBtn) playBtn.innerHTML = '<i class="fas fa-play"></i>';
 }
 
+// ============================================
+// FORMS
+// ============================================
+function setupForms() {
+    ['artistForm','contactForm'].forEach(id => {
+        const form = getEl(id);
+        if (!form) return;
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            showNotification("Submitted! We'll be in touch.");
+            form.reset();
+        });
+    });
+
+    document.querySelectorAll('.donate-opt').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.donate-opt').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+}
+
+// ============================================
+// NOTIFICATIONS & UTILS
+// ============================================
 function showNotification(message, type = 'info') {
-    const area = document.getElementById('notificationArea');
+    const area = getEl('notificationArea');
+    if (!area) return;
     const n = document.createElement('div');
-    n.className = `notification ${type}`;
+    n.className   = `notification ${type}`;
     n.textContent = message;
     area.appendChild(n);
-    setTimeout(() => {
-        n.style.opacity = '0';
-        setTimeout(() => n.remove(), 300);
-    }, 3000);
+    setTimeout(() => { n.style.opacity = '0'; setTimeout(() => n.remove(), 400); }, 4000);
 }
 
 function formatTime(s) {
-    if (isNaN(s)) return '0:00';
-    const m = Math.floor(s / 60);
+    if (!s || isNaN(s)) return '0:00';
+    const m   = Math.floor(s / 60);
     const sec = Math.floor(s % 60);
     return `${m}:${sec < 10 ? '0' : ''}${sec}`;
 }
 
-initApp();
+// ============================================
+// START
+// ============================================
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}

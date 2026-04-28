@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="SonicStream - A premium music downloader and player. Search, play, and download your favorite music instantly.">
-    <title>SonicStream | Premium Music Experience</title>
+    <meta name="description" content="NMstream - A premium music downloader and player. Search, play, and download your favorite music instantly.">
+    <title>NMstream | Premium Music Experience</title>
     
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=1.5">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar" role="navigation" aria-label="Main Navigation">
-            <div class="logo" aria-label="SonicStream Logo">
+            <div class="logo" aria-label="NMstream Logo">
                 <i class="fas fa-headphones-alt" aria-hidden="true"></i>
-                <span>SonicStream</span>
+                <span>NMstream</span>
             </div>
+
             <nav>
                 <ul class="nav-links">
                     <li><a href="#" class="nav-item active" id="navHome"><i class="fas fa-home"></i> <span>Home</span></a></li>
@@ -43,16 +45,25 @@
                         <input type="text" id="musicSearch" placeholder="Search for artists, songs, or albums...">
                     </div>
                     <div class="header-actions">
-                        <select id="sortOptions" class="sort-dropdown">
-                            <option value="none">Sort By</option>
-                            <option value="title">Title (A-Z)</option>
-                            <option value="artist">Artist (A-Z)</option>
-                        </select>
                         <button class="pro-badge">PRO</button>
                     </div>
                 </header>
 
+                <!-- Featured Section -->
+                <section class="featured-banner">
+                    <div class="featured-content">
+                        <span class="badge">FEATURED ARTIST</span>
+                        <h1>Midnight City</h1>
+                        <p>Stream the new album "Neon Nights" exclusively on NMstream.</p>
+                        <div class="featured-btns">
+                            <button class="btn-play-featured" id="playFeatured"><i class="fas fa-play"></i> Play Now</button>
+                            <button class="btn-follow"><i class="fas fa-plus"></i> Follow</button>
+                        </div>
+                    </div>
+                </section>
+
                 <div class="genre-bar" id="genreBar">
+
                     <button class="genre-btn active" data-genre="all">Trending</button>
                     <button class="genre-btn" data-genre="lofi">Lofi</button>
                     <button class="genre-btn" data-genre="jazz">Jazz</button>
@@ -63,8 +74,9 @@
 
                 <section class="main-section">
                     <h2 class="section-title">Discover Music</h2>
-                    <div class="music-grid" id="musicGrid"></div>
+                    <div id="genreRows"></div>
                 </section>
+
             </div>
 
             <!-- Artist Submission Page -->
@@ -108,7 +120,7 @@
             <div id="proPage" style="display: none;">
                 <div class="pro-header">
                     <i class="fas fa-crown pro-icon-large"></i>
-                    <h2>Upgrade to SonicStream Pro</h2>
+                    <h2>Upgrade to NMstream Pro</h2>
                     <p>Unlock the ultimate music experience</p>
                 </div>
                 <div class="pro-grid">
@@ -148,14 +160,14 @@
                                 <i class="fas fa-envelope"></i>
                                 <div>
                                     <h4>Email Us</h4>
-                                    <p>support@sonicstream.com</p>
+                                    <p>mutainewton40@gmail.com</p>
                                 </div>
                             </div>
                             <div class="info-item">
-                                <i class="fas fa-map-marker-alt"></i>
+                                <i class="fas fa-phone-alt"></i>
                                 <div>
-                                    <h4>Office</h4>
-                                    <p>123 Music Ave, Sound City</p>
+                                    <h4>Call Us</h4>
+                                    <p>0115925596</p>
                                 </div>
                             </div>
                         </div>
@@ -173,19 +185,36 @@
             <div id="donatePage" style="display: none;">
                 <div class="pro-header">
                     <i class="fas fa-coffee pro-icon-large" style="color: #e67e22;"></i>
-                    <h2>Support SonicStream</h2>
+                    <h2>Support NMstream</h2>
                     <p>Help us keep the music playing for everyone.</p>
                 </div>
                 <div class="glass-card donate-card">
-                    <p class="form-desc">Your donations help us pay for servers and bandwidth. Every coffee counts!</p>
+                    <p class="form-desc">Your support keeps NMstream alive and ad-free. Choose your preferred method below.</p>
+                    
+                    <!-- M-Pesa Option -->
+                    <div class="mpesa-container">
+                        <div class="mpesa-header">
+                            <i class="fas fa-mobile-alt"></i>
+                            <span>Lipa na M-PESA</span>
+                        </div>
+                        <div class="till-box">
+                            <span class="till-label">Buy Goods Till Number:</span>
+                            <span class="till-number">3604170</span>
+                        </div>
+                        <p class="mpesa-hint">1. Go to M-PESA > Lipa na M-PESA<br>2. Select Buy Goods and Services<br>3. Enter Till Number: <b>3604170</b></p>
+                    </div>
+
+                    <div class="nav-divider" style="margin: 2rem 0;"></div>
+
                     <div class="donation-options">
                         <button class="donate-opt">$2</button>
                         <button class="donate-opt active">$5</button>
                         <button class="donate-opt">$10</button>
                         <button class="donate-opt">$25</button>
                     </div>
-                    <button class="upgrade-now-btn" style="background: #e67e22;">Donate via PayPal</button>
+                    <button class="upgrade-now-btn" style="background: #e67e22; width: 100%;">Donate via PayPal</button>
                 </div>
+
             </div>
         </main>
 
@@ -228,6 +257,8 @@
     <div id="notificationArea" class="notification-area"></div>
     <audio id="mainAudio"></audio>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=1.5"></script>
 </body>
 </html>
+
+

@@ -155,6 +155,80 @@ header {
     cursor: pointer;
 }
 
+/* Featured Banner */
+.featured-banner {
+    background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=1200&h=400&fit=crop');
+    background-size: cover;
+    background-position: center;
+    border-radius: 24px;
+    padding: 3rem;
+    margin-bottom: 2.5rem;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.featured-content { max-width: 500px; }
+.featured-content .badge {
+    background: var(--accent-primary);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+.featured-content h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+}
+
+.featured-content p {
+    color: var(--text-dim);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+.featured-btns { display: flex; gap: 1rem; }
+
+.btn-play-featured {
+    background: white;
+    color: black;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.btn-play-featured:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(255,255,255,0.2);
+}
+
+.btn-follow {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-follow:hover { background: rgba(255,255,255,0.2); }
+
 /* Genre Bar */
 .genre-bar {
     display: flex;
@@ -182,8 +256,85 @@ header {
 /* Music Grid */
 .music-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+/* ── Genre Discovery Rows ── */
+.genre-row {
+    margin-bottom: 3rem;
+}
+
+.genre-row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+}
+
+.genre-row-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Horizontal scroll strip */
+.genre-row-scroll {
+    display: flex;
+    gap: 1.2rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(125,95,255,0.4) transparent;
+}
+
+.genre-row-scroll::-webkit-scrollbar       { height: 4px; }
+.genre-row-scroll::-webkit-scrollbar-track { background: transparent; }
+.genre-row-scroll::-webkit-scrollbar-thumb { background: rgba(125,95,255,0.5); border-radius: 4px; }
+
+/* Compact card for horizontal rows */
+.track-card-h {
+    flex: 0 0 170px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: transform 0.25s, background 0.25s;
+}
+
+.track-card-h:hover {
+    transform: translateY(-6px);
+    background: rgba(255,255,255,0.08);
+}
+
+.track-card-h .card-img-container img {
+    border-radius: 12px;
+}
+
+.track-card-h .track-info h3 {
+    font-size: 0.85rem;
+    margin-top: 0.6rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.track-card-h .track-info p {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Loading row placeholder */
+.loading-row {
+    color: var(--text-dim);
+    padding: 1rem 0;
+    font-size: 0.9rem;
+    animation: pulse 1.5s infinite;
 }
 
 .track-card {
@@ -280,6 +431,57 @@ header {
 
 .error { color: #ff5e57; border-color: rgba(255, 94, 87, 0.2); }
 
+/* M-Pesa Styles */
+.mpesa-container {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.mpesa-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    color: #4CAF50; /* M-Pesa Green */
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.till-box {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+.till-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-bottom: 0.3rem;
+}
+
+.till-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent-secondary);
+    letter-spacing: 2px;
+}
+
+.mpesa-hint {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    text-align: left;
+    margin-top: 1rem;
+}
+
+
 .retry-btn {
     background: var(--accent-primary);
     border: none;
@@ -290,6 +492,28 @@ header {
     cursor: pointer;
     font-weight: 600;
 }
+
+.load-more-btn {
+    display: block;
+    margin: 3rem auto;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
+    padding: 1rem 3rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+    backdrop-filter: blur(10px);
+}
+
+.load-more-btn:hover {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(125, 95, 255, 0.3);
+}
+
 
 
 
@@ -448,12 +672,28 @@ header {
 }
 
 .notification {
-    background: rgba(125, 95, 255, 0.9);
+    background: rgba(125, 95, 255, 0.95);
     color: white;
-    padding: 1rem 2rem;
+    padding: 1.2rem 2rem;
     border-radius: 12px;
     margin-bottom: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: 0.4s;
+    min-width: 300px;
+    font-weight: 500;
 }
+
+.notification.error {
+    background: rgba(255, 94, 87, 0.95);
+    border-color: rgba(255,255,255,0.2);
+}
+
+.notification.warning {
+    background: rgba(243, 156, 18, 0.95);
+}
+
 
 /* Pro Page Styles */
 .pro-header { text-align: center; margin-bottom: 3rem; }
