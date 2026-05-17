@@ -1,6 +1,6 @@
-# SonicStream | Premium Music Downloader
+# NMstream | Premium Music Experience
 
-A modern, high-performance music downloader and player built with a sleek Glassmorphism design. SonicStream offers a premium experience for searching, playing, and downloading your favorite music tracks.
+A modern, high-performance music downloader and player built with a sleek Glassmorphism design. NMstream offers a premium experience for searching, playing, and downloading your favorite music tracks.
 
 ## ✨ Features
 

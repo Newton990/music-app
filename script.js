@@ -129,6 +129,7 @@ async function loadGenreRow(tag, index) {
 function buildHCard(track) {
     const card = document.createElement('div');
     card.className = `track-card-h ${currentTrack?.id === track.id ? 'active' : ''}`;
+    card.dataset.trackId = track.id;
     card.innerHTML = `
         <div class="card-img-container">
             <img src="${track.cover}" alt="${track.title}" loading="lazy"
@@ -191,6 +192,7 @@ async function doSearch(query) {
         tracks.push(track);
         const card = document.createElement('div');
         card.className = `track-card ${currentTrack?.id === track.id ? 'active' : ''}`;
+        card.dataset.trackId = track.id;
         card.innerHTML = `
             <div class="card-img-container">
                 <img src="${track.cover}" alt="${track.title}" loading="lazy"
@@ -281,6 +283,7 @@ function setupNavigation() {
                 tracks.push(track);
                 const card = document.createElement('div');
                 card.className = `track-card ${currentTrack?.id === track.id ? 'active' : ''}`;
+                card.dataset.trackId = track.id;
                 card.innerHTML = `
                     <div class="card-img-container">
                         <img src="${track.cover}" alt="${track.title}" loading="lazy"
@@ -383,6 +386,8 @@ function selectTrack(track) {
     if (artist) artist.textContent = track.artist;
 
     document.querySelectorAll('.track-card, .track-card-h').forEach(c => c.classList.remove('active'));
+    const activeCard = document.querySelector(`[data-track-id="${track.id}"]`);
+    if (activeCard) activeCard.classList.add('active');
     playTrack();
 }
 
