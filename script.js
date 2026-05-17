@@ -22,9 +22,10 @@ const DISCOVERY_GENRES = [
 ];
 
 // App state
-let tracks       = [];
-let currentTrack = null;
-let isPlaying    = false;
+let tracks            = [];
+let currentTrack      = null;
+let isPlaying         = false;
+let activeDownloadUrl = null;
 
 // ============================================
 // HELPERS
@@ -336,9 +337,22 @@ function setupAudioPlayer() {
     }
 
     if (downloadBtn) {
-        downloadBtn.addEventListener('click', () => {
-            if (!currentTrack) { showNotification('Select a track first!', 'warning'); return; }
-            window.open(currentTrack.url, '_blank');
+        downloadBtn.addEventListener('click', async () => {
+            if (!currentTrack) {
+                showNotification('Select a track first!', 'warning');
+                return;
+            }
+            if (currentTrack.downloadReady && currentTrack.downloadUrl) {
+                triggerDownload(currentTrack);
+                return;
+            }
+            showNotification('Preparing your download…');
+            const ready = await prepareDownload(currentTrack);
+            if (ready) {
+                triggerDownload(currentTrack);
+            } else {
+                window.open(currentTrack.url, '_blank');
+            }
         });
     }
 
@@ -388,6 +402,8 @@ function selectTrack(track) {
     document.querySelectorAll('.track-card, .track-card-h').forEach(c => c.classList.remove('active'));
     const activeCard = document.querySelector(`[data-track-id="${track.id}"]`);
     if (activeCard) activeCard.classList.add('active');
+
+    prepareDownload(track);
     playTrack();
 }
 
@@ -408,6 +424,39 @@ function pauseTrack() {
     isPlaying = false;
     if (audio)   audio.pause();
     if (playBtn) playBtn.innerHTML = '<i class="fas fa-play"></i>';
+}
+
+async function prepareDownload(track) {
+    if (!track || !track.url) return false;
+    if (track.downloadReady && track.downloadUrl) return true;
+
+    try {
+        const response = await fetch(track.url);
+        if (!response.ok) throw new Error(`Download fetch failed: ${response.status}`);
+        const blob = await response.blob();
+        if (activeDownloadUrl) URL.revokeObjectURL(activeDownloadUrl);
+
+        const downloadUrl = URL.createObjectURL(blob);
+        activeDownloadUrl = downloadUrl;
+        track.downloadUrl = downloadUrl;
+        track.downloadReady = true;
+        track.downloadFileName = `${track.artist || 'track'} - ${track.title || 'audio'}.mp3`;
+        showNotification('Music is ready to download.');
+        return true;
+    } catch (error) {
+        console.warn('Download prep failed:', error);
+        showNotification('Could not prefetch the track. Opening the audio link instead.', 'warning');
+        return false;
+    }
+}
+
+function triggerDownload(track) {
+    const link = document.createElement('a');
+    link.href = track.downloadUrl || track.url;
+    link.download = track.downloadFileName || `${track.title || 'track'}.mp3`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
 }
 
 // ============================================
