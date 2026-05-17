@@ -7,6 +7,85 @@ const JAMENDO_BASE      = 'https://api.jamendo.com/v3.0/tracks/';
 const CORS_PROXY        = 'https://corsproxy.io/?';
 const ROW_LIMIT         = 20;
 
+const SAMPLE_TRACKS = [
+    {
+        id: 's1',
+        title: 'Sunset Drive',
+        artist: 'Neon Waves',
+        cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=400&fit=crop',
+        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+        albumId: 'a1',
+        albumTitle: 'Neon Nights',
+        albumCover: 'https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=400&h=400&fit=crop',
+        tags: ['electronic', 'ambient']
+    },
+    {
+        id: 's2',
+        title: 'City Lights',
+        artist: 'Neon Waves',
+        cover: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=400&h=400&fit=crop',
+        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+        albumId: 'a1',
+        albumTitle: 'Neon Nights',
+        albumCover: 'https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=400&h=400&fit=crop',
+        tags: ['electronic']
+    },
+    {
+        id: 's3',
+        title: 'Midnight Jazz',
+        artist: 'Velvet Echo',
+        cover: 'https://images.unsplash.com/photo-1511376777868-611b54f68947?w=400&h=400&fit=crop',
+        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+        albumId: 'a2',
+        albumTitle: 'Midnight Vibes',
+        albumCover: 'https://images.unsplash.com/photo-1511376777868-611b54f68947?w=400&h=400&fit=crop',
+        tags: ['jazz', 'ambient']
+    },
+    {
+        id: 's4',
+        title: 'Velvet Rain',
+        artist: 'Velvet Echo',
+        cover: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=400&h=400&fit=crop',
+        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+        albumId: 'a2',
+        albumTitle: 'Midnight Vibes',
+        albumCover: 'https://images.unsplash.com/photo-1511376777868-611b54f68947?w=400&h=400&fit=crop',
+        tags: ['jazz']
+    },
+    {
+        id: 's5',
+        title: 'Summer Drive',
+        artist: 'Golden Sun',
+        cover: 'https://images.unsplash.com/photo-1500534623283-312aade485b7?w=400&h=400&fit=crop',
+        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
+        albumId: 'a3',
+        albumTitle: 'Highway Dreams',
+        albumCover: 'https://images.unsplash.com/photo-1500534623283-312aade485b7?w=400&h=400&fit=crop',
+        tags: ['rock', 'pop']
+    },
+    {
+        id: 's6',
+        title: 'Road Trip',
+        artist: 'Golden Sun',
+        cover: 'https://images.unsplash.com/photo-1485579149621-3123dd979885?w=400&h=400&fit=crop',
+        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
+        albumId: 'a3',
+        albumTitle: 'Highway Dreams',
+        albumCover: 'https://images.unsplash.com/photo-1500534623283-312aade485b7?w=400&h=400&fit=crop',
+        tags: ['rock']
+    }
+];
+
+function getFallbackTracks(tag = '', query = '') {
+    const normalizedQuery = (query || '').trim().toLowerCase();
+    return SAMPLE_TRACKS.filter(track => {
+        const tagMatch = !tag || track.tags?.some(t => t.toLowerCase() === tag.toLowerCase());
+        const queryMatch = !normalizedQuery || [track.title, track.artist, track.albumTitle]
+            .some(text => text && text.toLowerCase().includes(normalizedQuery));
+        return tagMatch && queryMatch;
+    });
+}
+
 // Genre rows shown on the home page
 const DISCOVERY_GENRES = [
     { tag: '',           label: '🔥 Trending Now'      },
@@ -50,7 +129,7 @@ async function jamendoFetch(tag = '', query = '', limit = ROW_LIMIT, offset = 0)
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         if (data.error || data.headers?.status === 'failed') {
-            throw new Error(data.error || data.headers.error_message || 'Jamendo API error');
+            throw new Error(data.error || data.headers?.error_message || 'Jamendo API error');
         }
         return data.results || [];
     }
@@ -73,13 +152,13 @@ async function jamendoFetch(tag = '', query = '', limit = ROW_LIMIT, offset = 0)
 function mapTrack(item) {
     return {
         id:          item.id,
-        title:       item.name,
-        artist:      item.artist_name,
-        cover:       item.image || item.album_image || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop',
-        url:         item.audio,
-        albumId:     item.album_id || null,
-        albumTitle:  item.album_name || null,
-        albumCover:  item.album_image || item.image || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop'
+        title:       item.name || item.title,
+        artist:      item.artist_name || item.artist,
+        cover:       item.cover || item.image || item.album_image || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop',
+        url:         item.url || item.audio,
+        albumId:     item.album_id || item.albumId || null,
+        albumTitle:  item.album_name || item.albumTitle || null,
+        albumCover:  item.albumCover || item.album_image || item.image || item.cover || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop'
     };
 }
 
@@ -125,15 +204,18 @@ async function loadGenreRow(tag, index) {
     const scroll = getEl(`rowScroll-${index}`);
     if (!scroll) return;
 
-    const results = await jamendoFetch(tag);
-
-    if (results === null) {
-        scroll.innerHTML = '<div class="no-results">⚠️ Could not load – check your internet connection.</div>';
-        return;
-    }
-    if (results.length === 0) {
-        scroll.innerHTML = '<div class="no-results">No tracks found for this genre.</div>';
-        return;
+    let results = await jamendoFetch(tag);
+    if (results === null || results.length === 0) {
+        const fallback = getFallbackTracks(tag);
+        if (fallback.length > 0) {
+            results = fallback;
+        } else if (results === null) {
+            scroll.innerHTML = '<div class="no-results">⚠️ Could not load – check your internet connection.</div>';
+            return;
+        } else {
+            scroll.innerHTML = '<div class="no-results">No tracks found for this genre.</div>';
+            return;
+        }
     }
 
     scroll.innerHTML = '';
@@ -218,13 +300,17 @@ async function doSearch(query) {
 
     const results = await jamendoFetch('', query, 40);
 
-    if (results === null) {
-        container.innerHTML = '<div class="error"><p>⚠️ Search failed. Check your connection.</p></div>';
-        return;
-    }
-    if (results.length === 0) {
-        container.innerHTML = '<div class="no-results">No songs matched your search.</div>';
-        return;
+    if (results === null || results.length === 0) {
+        const fallback = getFallbackTracks('', query);
+        if (fallback.length > 0) {
+            results = fallback;
+        } else if (results === null) {
+            container.innerHTML = '<div class="error"><p>⚠️ Search failed. Check your connection.</p></div>';
+            return;
+        } else {
+            container.innerHTML = '<div class="no-results">No songs matched your search.</div>';
+            return;
+        }
     }
 
     tracks = [];
