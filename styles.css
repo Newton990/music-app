@@ -260,6 +260,45 @@ header {
     gap: 1.5rem;
 }
 
+.album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.album-card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 22px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.25s, background 0.25s;
+}
+
+.album-card:hover {
+    transform: translateY(-6px);
+    background: rgba(255,255,255,0.12);
+}
+
+.album-card .card-img-container {
+    aspect-ratio: 1 / 1;
+}
+
+.album-card .track-info {
+    padding: 1rem;
+}
+
+.album-card h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.album-card p {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+}
+
 /* ── Genre Discovery Rows ── */
 .genre-row {
     margin-bottom: 3rem;

@@ -26,6 +26,7 @@ let tracks            = [];
 let currentTrack      = null;
 let isPlaying         = false;
 let activeDownloadUrl = null;
+let activeSearchTracks = [];
 
 // ============================================
 // HELPERS
@@ -45,24 +46,40 @@ async function jamendoFetch(tag = '', query = '', limit = ROW_LIMIT, offset = 0)
     const apiUrl   = buildJamendoUrl(tag, query, limit, offset);
     const proxyUrl = CORS_PROXY + encodeURIComponent(apiUrl);
 
-    try {
-        const res = await fetch(proxyUrl);
+    async function parseResponse(res) {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
+        if (data.error || data.headers?.status === 'failed') {
+            throw new Error(data.error || data.headers.error_message || 'Jamendo API error');
+        }
         return data.results || [];
+    }
+
+    try {
+        const res = await fetch(proxyUrl);
+        return await parseResponse(res);
     } catch (err) {
-        console.error('Jamendo fetch failed:', err);
-        return null;   // null = network error
+        console.warn('Jamendo proxy fetch failed:', err);
+        try {
+            const direct = await fetch(apiUrl);
+            return await parseResponse(direct);
+        } catch (fallbackErr) {
+            console.error('Jamendo direct fetch failed:', fallbackErr);
+            return null;   // null = network or API error
+        }
     }
 }
 
 function mapTrack(item) {
     return {
-        id:     item.id,
-        title:  item.name,
-        artist: item.artist_name,
-        cover:  item.image || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop',
-        url:    item.audio
+        id:          item.id,
+        title:       item.name,
+        artist:      item.artist_name,
+        cover:       item.image || item.album_image || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop',
+        url:         item.audio,
+        albumId:     item.album_id || null,
+        albumTitle:  item.album_name || null,
+        albumCover:  item.album_image || item.image || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop'
     };
 }
 
@@ -163,6 +180,37 @@ function setupSearch() {
     });
 }
 
+function showAlbumTracks(albumId, albumTitle) {
+    const grid = getEl('searchGrid');
+    const header = getEl('searchResultsTitle');
+    if (!grid) return;
+
+    if (header) {
+        header.textContent = `🎵 Tracks from "${albumTitle}"`;
+    }
+    grid.innerHTML = '';
+
+    activeSearchTracks
+        .filter(track => track.albumId === albumId)
+        .forEach(track => {
+            const card = document.createElement('div');
+            card.className = `track-card ${currentTrack?.id === track.id ? 'active' : ''}`;
+            card.dataset.trackId = track.id;
+            card.innerHTML = `
+                <div class="card-img-container">
+                    <img src="${track.cover}" alt="${track.title}" loading="lazy"
+                         onerror="this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop'">
+                    <div class="play-overlay"><i class="fas fa-play"></i></div>
+                </div>
+                <div class="track-info">
+                    <h3 title="${track.title}">${track.title}</h3>
+                    <p title="${track.artist}">${track.artist}</p>
+                </div>`;
+            card.onclick = () => selectTrack(track);
+            grid.appendChild(card);
+        });
+}
+
 async function doSearch(query) {
     const container = getEl('genreRows');
     if (!container) return;
@@ -179,18 +227,62 @@ async function doSearch(query) {
         return;
     }
 
-    container.innerHTML = `
+    tracks = [];
+    activeSearchTracks = [];
+    const albumMap = new Map();
+    results.forEach(item => {
+        const track = mapTrack(item);
+        tracks.push(track);
+        activeSearchTracks.push(track);
+        if (track.albumId && !albumMap.has(track.albumId)) {
+            albumMap.set(track.albumId, {
+                id:    track.albumId,
+                title: track.albumTitle || 'Unknown Album',
+                cover: track.albumCover,
+                artist: track.artist
+            });
+        }
+    });
+
+    const albumSection = albumMap.size > 0 ? `
         <div class="genre-row">
             <div class="genre-row-header">
-                <h3 class="genre-row-title">🔍 Search Results (${results.length})</h3>
+                <h3 class="genre-row-title">📀 Albums matching "${query}"</h3>
+            </div>
+            <div class="music-grid album-grid" id="albumGrid"></div>
+        </div>` : '';
+
+    container.innerHTML = `${albumSection}
+        <div class="genre-row">
+            <div class="genre-row-header">
+                <h3 class="genre-row-title" id="searchResultsTitle">🔍 Search Results (${results.length})</h3>
             </div>
             <div class="music-grid" id="searchGrid"></div>
         </div>`;
 
+    const albumGrid = getEl('albumGrid');
+    if (albumGrid) {
+        Array.from(albumMap.values()).forEach(album => {
+            const albumCard = document.createElement('div');
+            albumCard.className = 'album-card';
+            albumCard.innerHTML = `
+                <div class="card-img-container">
+                    <img src="${album.cover}" alt="${album.title}" loading="lazy"
+                         onerror="this.src='https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop'">
+                </div>
+                <div class="track-info">
+                    <h3 title="${album.title}">${album.title}</h3>
+                    <p title="${album.artist}">${album.artist}</p>
+                </div>`;
+            albumCard.onclick = () => showAlbumTracks(album.id, album.title);
+            albumGrid.appendChild(albumCard);
+        });
+    }
+
     const grid = getEl('searchGrid');
+    if (!grid) return;
     results.forEach(item => {
         const track = mapTrack(item);
-        tracks.push(track);
         const card = document.createElement('div');
         card.className = `track-card ${currentTrack?.id === track.id ? 'active' : ''}`;
         card.dataset.trackId = track.id;
