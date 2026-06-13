@@ -20,7 +20,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed mb-5">
-              Kenya's premier online movie ticket booking platform. Experience cinema like never before.
+                Kenya's premier online movie ticket booking platform. Experience cinema like never before with M-Pesa payments and seamless seat selection.
             </p>
             <div className="flex gap-3">
               {[Facebook, Twitter, Instagram, Youtube].map((Icon, i) => (
@@ -86,7 +86,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start gap-3 text-slate-400 text-sm">
                 <MapPin className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
-                Kenya Highlands University, Kericho, Kenya
+                Nairobi, Kenya
               </li>
               <li className="flex items-center gap-3 text-slate-400 text-sm">
                 <Phone className="w-4 h-4 text-amber-400 shrink-0" />
@@ -115,14 +115,14 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-12 pt-6 border-t border-cinema-border flex flex-col md:flex-row items-center justify-between gap-3">
-          <p className="text-slate-500 text-xs">
-            © {year} CinemaKE. Kenya Highlands University — BIT/007/2022
-          </p>
-          <p className="text-slate-600 text-xs">
-            Developed by Faith Ogutu Moraa · Supervisor: Geofrey Rotich
-          </p>
-        </div>
+          <div className="mt-12 pt-6 border-t border-cinema-border flex flex-col md:flex-row items-center justify-between gap-3">
+            <p className="text-slate-500 text-xs">
+              © {year} CinemaKE. All rights reserved.
+            </p>
+            <p className="text-slate-600 text-xs">
+              Made with ❤️ for Kenyan movie lovers
+            </p>
+          </div>
       </div>
     </footer>
   );

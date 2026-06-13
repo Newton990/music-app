@@ -28,13 +28,6 @@ export default function LoginPage() {
     }
   };
 
-  const demoLogin = async (e: string, p: string) => {
-    setLoading(true);
-    const result = await login(e, p);
-    setLoading(false);
-    if (result.success) { toast.success("Demo login successful!"); router.push("/"); }
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-16 pt-24">
       {/* Background glow */}
@@ -70,12 +63,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <div className="flex justify-between mb-1.5">
-                <label className="text-xs text-slate-400">Password</label>
-                <button type="button" className="text-xs text-amber-400 hover:text-amber-300">
-                  Forgot password?
-                </button>
-              </div>
+              <label className="text-xs text-slate-400 mb-1.5">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
@@ -107,31 +95,6 @@ export default function LoginPage() {
               )}
             </button>
           </form>
-
-          <div className="relative my-5">
-            <div className="border-t border-cinema-border" />
-            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-cinema-card px-3 text-xs text-slate-500">
-              or use demo account
-            </span>
-          </div>
-
-          {/* Demo buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => demoLogin("faith@cinema.com", "password123")}
-              disabled={loading}
-              className="btn-outline-gold text-xs py-2.5"
-            >
-              👤 Customer
-            </button>
-            <button
-              onClick={() => demoLogin("admin@cinema.com", "admin123")}
-              disabled={loading}
-              className="btn-outline-gold text-xs py-2.5"
-            >
-              🛡️ Admin
-            </button>
-          </div>
         </div>
 
         <p className="text-center text-sm text-slate-400 mt-5">
