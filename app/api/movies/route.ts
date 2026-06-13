@@ -26,5 +26,5 @@ export async function GET(req: NextRequest) {
   sql += " ORDER BY status, releaseDate DESC";
 
   const movies = await query<any[]>(sql, params);
-  return NextResponse.json(movies);
+  return NextResponse.json(movies.map(m => ({ ...m, genre: typeof m.genre === "string" ? JSON.parse(m.genre) : m.genre })));
 }

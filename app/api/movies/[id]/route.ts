@@ -7,6 +7,8 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     return NextResponse.json({ error: "Movie not found" }, { status: 404 });
   }
 
+  movie.genre = typeof movie.genre === "string" ? JSON.parse(movie.genre) : movie.genre;
+
   const shows = await query<any[]>(
     `SELECT sh.*, sc.name as screenName, ci.name as cinemaName, ci.location
      FROM \`Show\` sh
