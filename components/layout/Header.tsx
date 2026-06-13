@@ -97,23 +97,13 @@ export default function Header() {
                       <p className="text-xs text-slate-400">{user.email}</p>
                     </div>
                     <div className="py-1">
-                      {user.role === "admin" ? (
-                        <Link
-                          href="/admin"
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
-                        >
-                          <ShieldCheck className="w-4 h-4 text-amber-400" />
-                          Admin Dashboard
-                        </Link>
-                      ) : (
-                        <Link
-                          href="/dashboard"
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
-                        >
-                          <LayoutDashboard className="w-4 h-4 text-amber-400" />
-                          My Dashboard
-                        </Link>
-                      )}
+                      <Link
+                        href="/dashboard"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+                      >
+                        <LayoutDashboard className="w-4 h-4 text-amber-400" />
+                        My Dashboard
+                      </Link>
                       <Link
                         href="/dashboard"
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"

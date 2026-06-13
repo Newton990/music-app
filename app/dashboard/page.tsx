@@ -3,26 +3,26 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { useBooking } from "@/context/booking-context";
-import { MOCK_MOVIES, MOCK_SHOWS, MOCK_CINEMAS } from "@/lib/mock-data";
 import { formatCurrency, formatDate, formatTime } from "@/lib/utils";
 import { Ticket, Calendar, MapPin, Clock } from "lucide-react";
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const router = useRouter();
-  const { bookings, payments } = useBooking();
+  const { getUserBookings, payments } = useBooking();
+  const [bookings, setBookings] = useState<any[]>([]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     if (!user) router.push("/login?redirect=/dashboard");
+    else getUserBookings().then(setBookings);
   }, [user, router]);
 
   if (!mounted || !user) return null;
 
   const userBookings = bookings
-    .filter((b) => b.userId === user.id)
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
     <div className="pt-24 pb-16 min-h-screen max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -63,13 +63,8 @@ export default function DashboardPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {userBookings.map((booking) => {
-            const show = MOCK_SHOWS.find((s) => s.id === booking.showId);
-            const movie = show ? MOCK_MOVIES.find((m) => m.id === show.movieId) : null;
-            const cinema = show ? MOCK_CINEMAS.find((c) => c.id === show.cinemaId) : null;
-            const pmnt = payments.find((p) => p.bookingId === booking.id);
-
-            const isUpcoming = show && new Date(show.startTime) > new Date();
+          {userBookings.map((booking: any) => {
+            const isUpcoming = booking.startTime && new Date(booking.startTime) > new Date();
 
             return (
               <div
@@ -91,26 +86,26 @@ export default function DashboardPage() {
                   </div>
 
                   <h3 className="text-lg font-bold text-white mb-4 line-clamp-1">
-                    {movie?.title ?? "Unknown Movie"}
+                    {booking.movieTitle ?? "Unknown Movie"}
                   </h3>
 
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center gap-3 text-sm text-slate-300">
                       <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
-                      {show ? formatDate(show.startTime) : "N/A"}
+                      {booking.startTime ? formatDate(booking.startTime) : "N/A"}
                     </div>
                     <div className="flex items-center gap-3 text-sm text-slate-300">
                       <Clock className="w-4 h-4 text-amber-400 shrink-0" />
-                      {show ? formatTime(show.startTime) : "N/A"}
+                      {booking.startTime ? formatTime(booking.startTime) : "N/A"}
                     </div>
                     <div className="flex items-center gap-3 text-sm text-slate-300">
                       <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span className="line-clamp-1">{cinema?.name ?? "N/A"}</span>
+                      <span className="line-clamp-1">{booking.cinemaName ?? "N/A"}</span>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap gap-1 mb-5">
-                    {booking.seats.map((s) => (
+                    {(typeof booking.seats === "string" ? JSON.parse(booking.seats) : booking.seats).map((s: any) => (
                       <span key={s.seatId} className="text-xs bg-white/5 border border-white/10 px-1.5 py-0.5 rounded font-mono text-slate-400">
                         {s.seatId.split("-").slice(-1)[0]}
                       </span>

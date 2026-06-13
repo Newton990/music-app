@@ -1,18 +1,24 @@
 "use client";
-import { useState } from "react";
-import { Search, SlidersHorizontal } from "lucide-react";
-import { MOCK_MOVIES } from "@/lib/mock-data";
+import { useState, useEffect } from "react";
+import { Search } from "lucide-react";
 import MovieCard from "@/components/movies/MovieCard";
+import type { Movie } from "@/lib/types";
 
 const GENRES = ["All", "Action", "Drama", "Sci-Fi", "Thriller", "Romance", "Horror", "Comedy", "Adventure", "Historical"];
 
 export default function MoviesPage() {
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [genre, setGenre] = useState("All");
   const [status, setStatus] = useState<"all" | "now_showing" | "coming_soon">("all");
 
-  const filtered = MOCK_MOVIES.filter((m) => {
-    const matchSearch = m.title.toLowerCase().includes(search.toLowerCase()) ||
+  useEffect(() => {
+    fetch("/api/movies").then(r => r.json()).then(data => { setMovies(data); setLoading(false); });
+  }, []);
+
+  const filtered = movies.filter((m) => {
+    const matchSearch = !search || m.title.toLowerCase().includes(search.toLowerCase()) ||
       m.genre.some((g) => g.toLowerCase().includes(search.toLowerCase()));
     const matchGenre = genre === "All" || m.genre.includes(genre);
     const matchStatus = status === "all" || m.status === status;

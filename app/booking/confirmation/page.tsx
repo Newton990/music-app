@@ -1,26 +1,27 @@
 "use client";
-import { Suspense } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, Download, Share2, Calendar, MapPin, Ticket, QrCode, Home } from "lucide-react";
-import { useBooking } from "@/context/booking-context";
-import { MOCK_MOVIES, MOCK_SHOWS, MOCK_CINEMAS, MOCK_SCREENS } from "@/lib/mock-data";
+import { CheckCircle, Calendar, MapPin, Ticket, Home } from "lucide-react";
 import { formatCurrency, formatDate, formatTime } from "@/lib/utils";
 
 function ConfirmationContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const bookingId = searchParams.get("bookingId") ?? "";
-  const { bookings, payments } = useBooking();
+  const [booking, setBooking] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const booking = bookings.find((b) => b.id === bookingId);
-  const payment = payments.find((p) => p.bookingId === bookingId);
-  const show = booking ? MOCK_SHOWS.find((s) => s.id === booking.showId) : null;
-  const movie = show ? MOCK_MOVIES.find((m) => m.id === show.movieId) : null;
-  const cinema = show ? MOCK_CINEMAS.find((c) => c.id === show.cinemaId) : null;
-  const screen = show ? MOCK_SCREENS.find((s) => s.id === show.screenId) : null;
+  useEffect(() => {
+    if (bookingId) {
+      fetch(`/api/bookings/${bookingId}`).then(r => r.json()).then(data => { setBooking(data); setLoading(false); });
+    } else {
+      setLoading(false);
+    }
+  }, [bookingId]);
 
-  if (!booking || !movie || !show) {
+  if (loading) return <div className="pt-24 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>;
+  if (!booking) {
     return (
       <div className="pt-24 text-center">
         <p className="text-slate-400">Booking not found.</p>
@@ -29,122 +30,106 @@ function ConfirmationContent() {
     );
   }
 
-  const seatLabels = booking.seats.map((s) => {
-    const parts = s.seatId.split("-");
-    return parts[parts.length - 1];
-  });
+  const seats = typeof booking.seats === "string" ? JSON.parse(booking.seats) : booking.seats;
+  const seatLabels = seats.map((s: any) => s.seatId.split("-").slice(-1)[0]);
+
+  // Generate simulated QR code
+  const qrData = booking.qrCode || `BK-${bookingId}`;
+  const qrChars = qrData.split("").map((c: string) => c.charCodeAt(0));
 
   return (
     <div className="pt-20 pb-16 min-h-screen max-w-lg mx-auto px-4">
-      {/* Success header */}
       <div className="text-center mb-8 animate-fade-in">
-        <div className="w-20 h-20 bg-green-500/20 border border-green-500/40 rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_0_30px_rgba(34,197,94,0.2)]">
+        <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
           <CheckCircle className="w-10 h-10 text-green-400" />
         </div>
-        <h1 className="text-2xl font-black text-white mb-1">Booking Confirmed!</h1>
-        <p className="text-slate-400 text-sm">Your tickets are ready. Enjoy the show! 🎬</p>
+        <h1 className="text-3xl font-black text-white mb-2">Booking Confirmed!</h1>
+        <p className="text-slate-400">Your tickets have been booked successfully.</p>
       </div>
 
-      {/* Ticket card */}
-      <div className="card-cinema overflow-hidden mb-6 animate-slide-up">
-        {/* Top colored band */}
-        <div className="h-2 bg-gold-gradient" />
+      <div className="card-cinema p-6 mb-6 animate-slide-up">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-white">Your Ticket</h2>
+          <span className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full font-semibold">
+            {booking.status === "confirmed" ? "Paid" : booking.status}
+          </span>
+        </div>
 
-        <div className="p-6">
-          {/* Movie title */}
-          <h2 className="text-xl font-black text-white mb-1">{movie.title}</h2>
-          <div className="flex flex-wrap gap-2 mb-5">
-            {movie.genre.map((g) => <span key={g} className="badge-genre">{g}</span>)}
+        <div className="bg-cinema-bg rounded-xl p-5 border border-cinema-border mb-4">
+          <div className="flex items-center gap-3 mb-4">
+            <Ticket className="w-5 h-5 text-amber-400" />
+            <div>
+              <p className="text-lg font-bold text-white">{booking.movieTitle}</p>
+              <p className="text-xs text-slate-400">{booking.cinemaName} · {booking.screenName}</p>
+            </div>
           </div>
 
-          {/* Details grid */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div>
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Date & Time</p>
-              <p className="text-sm font-semibold text-white">{formatDate(show.startTime)}</p>
-              <p className="text-sm text-amber-400 font-bold">{formatTime(show.startTime)}</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Cinema</p>
-              <p className="text-sm font-semibold text-white line-clamp-1">{cinema?.name}</p>
-              <p className="text-xs text-slate-400">{screen?.name}</p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Seats</p>
-              <div className="flex flex-wrap gap-1">
-                {seatLabels.map((s) => (
-                  <span key={s} className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded font-mono font-bold">
-                    {s}
-                  </span>
-                ))}
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
+              <div>
+                <p className="text-xs text-slate-500">Date</p>
+                <p className="text-sm text-white font-semibold">{formatDate(booking.startTime)}</p>
               </div>
             </div>
-            <div>
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Total Paid</p>
-              <p className="text-lg font-black text-amber-400">{formatCurrency(booking.totalAmount)}</p>
-              {payment && (
-                <p className="text-xs text-slate-500 capitalize">{payment.method}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Dashed separator */}
-          <div className="border-t border-dashed border-cinema-border my-4 relative">
-            <div className="absolute -left-6 -top-3 w-6 h-6 rounded-full bg-cinema-bg" />
-            <div className="absolute -right-6 -top-3 w-6 h-6 rounded-full bg-cinema-bg" />
-          </div>
-
-          {/* QR Code */}
-          <div className="flex flex-col items-center py-4">
-            <div className="qr-container mb-3">
-              {/* Simulated QR Code grid */}
-              <div className="w-36 h-36 grid grid-cols-9 gap-0.5">
-                {Array.from({ length: 81 }).map((_, i) => {
-                  const hash = (booking.id.charCodeAt(i % booking.id.length) + i * 7) % 3;
-                  return (
-                    <div
-                      key={i}
-                      className={`rounded-sm ${hash === 0 ? "bg-black" : "bg-white"}`}
-                    />
-                  );
-                })}
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
+              <div>
+                <p className="text-xs text-slate-500">Time</p>
+                <p className="text-sm text-white font-semibold">{formatTime(booking.startTime)}</p>
               </div>
             </div>
-            <p className="text-xs text-slate-500 font-mono">{booking.id}</p>
-            <p className="text-xs text-slate-600 mt-1">Show this at the cinema entrance</p>
           </div>
 
-          {/* Payment ref */}
-          {payment && (
-            <div className="bg-green-500/5 border border-green-500/20 rounded-lg p-3 mt-2">
-              <p className="text-xs text-green-400">
-                ✅ Payment confirmed · Ref: <span className="font-mono font-bold">{payment.transactionRef}</span>
-              </p>
+          <div className="flex items-center gap-2 mb-4">
+            <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
+            <div>
+              <p className="text-xs text-slate-500">Location</p>
+              <p className="text-sm text-white font-semibold">{booking.cinemaName}</p>
+            </div>
+          </div>
+
+          <div className="border-t border-cinema-border pt-3">
+            <p className="text-xs text-slate-500 mb-2">Seats</p>
+            <div className="flex flex-wrap gap-2">
+              {seats.map((s: any) => (
+                <span key={s.seatId} className="px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-sm font-bold text-amber-400">{s.seatId.split("-").slice(-1)[0]}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-center mb-4">
+          <div className="bg-white p-3 rounded-xl">
+            <div className="grid grid-cols-8 gap-0.5">
+              {Array.from({ length: 64 }).map((_, i) => (
+                <div key={i} className={`w-2 h-2 rounded-sm ${qrChars[i % qrChars.length] % 3 === 0 ? "bg-black" : "bg-gray-200"}`} />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="text-center mb-4">
+          <p className="text-xs text-slate-500 font-mono">{qrData}</p>
+        </div>
+
+        <div className="flex justify-between items-center border-t border-cinema-border pt-4">
+          <div>
+            <p className="text-xs text-slate-500">Total Paid</p>
+            <p className="text-xl font-black text-amber-400">{formatCurrency(booking.totalAmount)}</p>
+          </div>
+          {booking.transactionRef && (
+            <div className="text-right">
+              <p className="text-xs text-slate-500">Ref</p>
+              <p className="text-xs text-slate-300 font-mono">{booking.transactionRef}</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <button className="btn-outline-gold flex items-center justify-center gap-2 text-sm py-3">
-          <Download className="w-4 h-4" />
-          Download
-        </button>
-        <button className="btn-outline-gold flex items-center justify-center gap-2 text-sm py-3">
-          <Share2 className="w-4 h-4" />
-          Share
-        </button>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <Link href="/dashboard" className="btn-outline-gold flex items-center justify-center gap-2 text-sm py-3">
-          <Ticket className="w-4 h-4" />
-          My Bookings
-        </Link>
-        <Link href="/" className="btn-gold flex items-center justify-center gap-2 text-sm py-3">
-          <Home className="w-4 h-4" />
-          Home
+      <div className="flex flex-col gap-3">
+        <Link href="/dashboard" className="btn-gold flex items-center justify-center gap-2 py-4">
+          <Home className="w-4 h-4" /> Go to Dashboard
         </Link>
       </div>
     </div>

@@ -32,7 +32,7 @@ export default function LoginPage() {
     setLoading(true);
     const result = await login(e, p);
     setLoading(false);
-    if (result.success) { toast.success("Demo login successful!"); router.push(e.includes("admin") ? "/admin" : "/"); }
+    if (result.success) { toast.success("Demo login successful!"); router.push("/"); }
   };
 
   return (

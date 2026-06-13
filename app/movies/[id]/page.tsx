@@ -2,31 +2,15 @@
 import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Star, Clock, Calendar, Globe, User, ArrowLeft, Ticket, ChevronRight
 } from "lucide-react";
-import { MOCK_MOVIES, MOCK_SHOWS, MOCK_CINEMAS, MOCK_SCREENS } from "@/lib/mock-data";
 import { formatDuration, formatTime, formatDate, formatCurrency } from "@/lib/utils";
-import { use } from "react";
+import type { Movie } from "@/lib/types";
 
-const POSTER_BG: Record<string, string> = {
-  m1: "linear-gradient(145deg, #0d1b3e, #1a237e, #0d47a1)",
-  m2: "linear-gradient(145deg, #4a1000, #b71c1c, #7b2d0a)",
-  m3: "linear-gradient(145deg, #2e1a00, #5d3a00, #ff8f00)",
-  m4: "linear-gradient(145deg, #4a0e2a, #880e4f, #c62828)",
-  m5: "linear-gradient(145deg, #0a2e1a, #1b5e20, #004d40)",
-  m6: "linear-gradient(145deg, #1a0a2e, #4a148c, #1a237e)",
-  m7: "linear-gradient(145deg, #0a2e0a, #2e7d32, #43a047)",
-  m8: "linear-gradient(145deg, #3e0000, #b71c1c, #8b0000)",
-};
-const POSTER_EMOJI: Record<string, string> = {
-  m1: "🚀", m2: "🔥", m3: "⚔️", m4: "🌸", m5: "👻", m6: "🌌", m7: "💍", m8: "🔴",
-};
-
-// Group shows by date
-function groupShowsByDate(shows: typeof MOCK_SHOWS) {
-  const groups: Record<string, typeof MOCK_SHOWS> = {};
+function groupShowsByDate(shows: any[]) {
+  const groups: Record<string, any[]> = {};
   shows.forEach((s) => {
     const day = new Date(s.startTime).toDateString();
     if (!groups[day]) groups[day] = [];
@@ -38,15 +22,23 @@ function groupShowsByDate(shows: typeof MOCK_SHOWS) {
 export default function MovieDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
   const router = useRouter();
-  const movie = MOCK_MOVIES.find((m) => m.id === id);
+  const [movie, setMovie] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`/api/movies/${id}`).then(r => r.json()).then(data => { setMovie(data); setLoading(false); });
+  }, [id]);
+
+  if (loading) return <div className="pt-16 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>;
   if (!movie) return notFound();
 
-  const shows = MOCK_SHOWS.filter((s) => s.movieId === id);
+  const shows = movie.shows || [];
   const showGroups = groupShowsByDate(shows);
   const dates = Object.keys(showGroups);
-  const [selectedDate, setSelectedDate] = useState(dates[0] ?? "");
+  const [selectedDate, setSelectedDate] = useState("");
 
-  const dayShows = showGroups[selectedDate] ?? [];
+  const dayShows = selectedDate ? (showGroups[selectedDate] ?? []) : [];
+  if (dates.length > 0 && !selectedDate) setSelectedDate(dates[0]);
 
   return (
     <div className="pt-16 min-h-screen">
@@ -64,7 +56,7 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
           </button>
 
           <div className="flex flex-wrap gap-2 mb-3">
-            {movie.genre.map((g) => (
+            {movie.genre?.map((g: string) => (
               <span key={g} className="badge-genre">{g}</span>
             ))}
             <span className="badge-rating">{movie.rating}</span>
@@ -96,15 +88,12 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          {/* Left — Details */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Synopsis */}
             <div className="card-cinema p-6">
               <h2 className="text-lg font-bold text-white mb-3">Synopsis</h2>
               <p className="text-slate-300 leading-relaxed">{movie.description}</p>
             </div>
 
-            {/* Cast & Crew */}
             <div className="card-cinema p-6">
               <h2 className="text-lg font-bold text-white mb-4">Cast & Crew</h2>
               <div className="mb-3">
@@ -117,7 +106,7 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
               <div>
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Cast</p>
                 <div className="flex flex-wrap gap-2">
-                  {movie.cast.map((c) => (
+                  {movie.cast?.map((c: string) => (
                     <span key={c} className="px-3 py-1 bg-cinema-bg border border-cinema-border rounded-lg text-sm text-slate-300">
                       {c}
                     </span>
@@ -127,7 +116,6 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
             </div>
           </div>
 
-          {/* Right — Showtimes */}
           <div className="space-y-4">
             {movie.status === "coming_soon" ? (
               <div className="card-cinema p-6 text-center">
@@ -147,7 +135,6 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
                   Book Tickets
                 </h2>
 
-                {/* Date selector */}
                 <div className="flex gap-2 flex-wrap mb-5">
                   {dates.slice(0, 5).map((d) => {
                     const date = new Date(d);
@@ -173,35 +160,30 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
                   })}
                 </div>
 
-                {/* Showtimes */}
                 <div className="space-y-3">
-                  {dayShows.map((show) => {
-                    const cinema = MOCK_CINEMAS.find((c) => c.id === show.cinemaId);
-                    const screen = MOCK_SCREENS.find((s) => s.id === show.screenId);
-                    return (
-                      <Link
-                        key={show.id}
-                        href={`/booking/${show.id}/seats`}
-                        className="block p-4 rounded-xl border border-cinema-border hover:border-amber-500/50 hover:bg-amber-500/5 transition-all group"
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-bold text-white text-lg">
-                            {formatTime(show.startTime)}
-                          </span>
-                          <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-amber-400 transition-colors" />
-                        </div>
-                        <div className="text-xs text-slate-400">
-                          <p>{cinema?.name}</p>
-                          <p>{screen?.name}</p>
-                        </div>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          <span className="text-xs text-slate-300">Standard: <span className="text-amber-400 font-semibold">{formatCurrency(show.price)}</span></span>
-                          <span className="text-xs text-blue-300">VIP: <span className="text-blue-400 font-semibold">{formatCurrency(show.vipPrice)}</span></span>
-                          <span className="text-xs text-purple-300">Premium: <span className="text-purple-400 font-semibold">{formatCurrency(show.premiumPrice)}</span></span>
-                        </div>
-                      </Link>
-                    );
-                  })}
+                  {dayShows.map((show: any) => (
+                    <Link
+                      key={show.id}
+                      href={`/booking/${show.id}/seats`}
+                      className="block p-4 rounded-xl border border-cinema-border hover:border-amber-500/50 hover:bg-amber-500/5 transition-all group"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-white text-lg">
+                          {formatTime(show.startTime)}
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-amber-400 transition-colors" />
+                      </div>
+                      <div className="text-xs text-slate-400">
+                        <p>{show.cinemaName}</p>
+                        <p>{show.screenName}</p>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        <span className="text-xs text-slate-300">Standard: <span className="text-amber-400 font-semibold">{formatCurrency(show.price)}</span></span>
+                        <span className="text-xs text-blue-300">VIP: <span className="text-blue-400 font-semibold">{formatCurrency(show.vipPrice)}</span></span>
+                        <span className="text-xs text-purple-300">Premium: <span className="text-purple-400 font-semibold">{formatCurrency(show.premiumPrice)}</span></span>
+                      </div>
+                    </Link>
+                  ))}
 
                   {dayShows.length === 0 && (
                     <p className="text-slate-500 text-sm text-center py-4">
@@ -212,7 +194,6 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
               </div>
             )}
 
-            {/* Seat types legend */}
             <div className="card-cinema p-5">
               <h3 className="text-sm font-bold text-white mb-3">Seat Categories</h3>
               <div className="space-y-2">

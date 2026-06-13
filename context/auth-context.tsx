@@ -1,7 +1,7 @@
 "use client";
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import type { User } from "@/lib/types";
-import { MOCK_USERS } from "@/lib/mock-data";
 
 interface AuthContextType {
   user: User | null;
@@ -13,91 +13,71 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// In-memory user registry (persisted to sessionStorage so page refresh keeps session)
-const USER_REGISTRY_KEY = "cinema_users";
-const SESSION_KEY = "cinema_session";
-
-function getRegistry(): User[] {
-  if (typeof window === "undefined") return [...MOCK_USERS];
-  const stored = sessionStorage.getItem(USER_REGISTRY_KEY);
-  if (stored) {
-    try {
-      return JSON.parse(stored) as User[];
-    } catch {
-      return [...MOCK_USERS];
-    }
-  }
-  // Seed defaults
-  sessionStorage.setItem(USER_REGISTRY_KEY, JSON.stringify(MOCK_USERS));
-  return [...MOCK_USERS];
-}
-
-function saveRegistry(users: User[]) {
-  if (typeof window !== "undefined") {
-    sessionStorage.setItem(USER_REGISTRY_KEY, JSON.stringify(users));
-  }
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: session, status } = useSession();
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // Restore session
-    const stored = sessionStorage.getItem(SESSION_KEY);
-    if (stored) {
-      try {
-        setUser(JSON.parse(stored));
-      } catch {
-        // ignore
+  const user: User | null = session?.user
+    ? {
+        id: session.user.id,
+        name: session.user.name || "",
+        email: session.user.email || "",
+        phone: session.user.phone || "",
+        password: "",
+        role: (session.user.role as any) || "customer",
+        createdAt: "",
       }
-    }
-    setIsLoading(false);
-  }, []);
+    : null;
 
   const login = async (email: string, password: string) => {
-    await new Promise((r) => setTimeout(r, 800)); // simulate network delay
-    const registry = getRegistry();
-    const found = registry.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-    );
-    if (!found) {
-      return { success: false, error: "Invalid email or password." };
+    setIsLoading(true);
+    try {
+      const result = await signIn("credentials", { email, password, redirect: false });
+      setIsLoading(false);
+      if (result?.error) return { success: false, error: "Invalid email or password." };
+      return { success: true };
+    } catch {
+      setIsLoading(false);
+      return { success: false, error: "Login failed. Please try again." };
     }
-    setUser(found);
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(found));
-    return { success: true };
   };
 
   const register = async (data: { name: string; email: string; phone: string; password: string }) => {
-    await new Promise((r) => setTimeout(r, 1000));
-    const registry = getRegistry();
-    if (registry.some((u) => u.email.toLowerCase() === data.email.toLowerCase())) {
-      return { success: false, error: "Email already registered." };
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setIsLoading(false);
+        return { success: false, error: json.error || "Registration failed." };
+      }
+      await signIn("credentials", { email: data.email, password: data.password, redirect: false });
+      setIsLoading(false);
+      return { success: true };
+    } catch {
+      setIsLoading(false);
+      return { success: false, error: "Registration failed. Please try again." };
     }
-    const newUser: User = {
-      id: `u${Date.now()}`,
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      password: data.password,
-      role: "customer",
-      createdAt: new Date().toISOString(),
-    };
-    const updated = [...registry, newUser];
-    saveRegistry(updated);
-    setUser(newUser);
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(newUser));
-    return { success: true };
   };
 
   const logout = () => {
-    setUser(null);
-    sessionStorage.removeItem(SESSION_KEY);
+    signOut({ callbackUrl: "/" });
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        register,
+        logout,
+        isLoading: isLoading || status === "loading",
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

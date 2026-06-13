@@ -3,36 +3,36 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Star, Clock, Play, ArrowRight, Ticket, CreditCard, Smartphone, CheckCircle } from "lucide-react";
-import { MOCK_MOVIES, MOCK_SHOWS, MOCK_CINEMAS } from "@/lib/mock-data";
 import { formatDuration, formatTime } from "@/lib/utils";
 import MovieCard from "@/components/movies/MovieCard";
-
-const HERO_MOVIES = MOCK_MOVIES.filter((m) => m.status === "now_showing").slice(0, 4);
-const NOW_SHOWING = MOCK_MOVIES.filter((m) => m.status === "now_showing");
-const COMING_SOON = MOCK_MOVIES.filter((m) => m.status === "coming_soon");
-
-const MOVIE_BG_COLORS: Record<string, string> = {
-  m1: "from-blue-900/60 to-indigo-900/40",
-  m2: "from-orange-900/60 to-red-900/40",
-  m3: "from-stone-900/60 to-amber-900/40",
-  m4: "from-pink-900/60 to-rose-900/40",
-  m5: "from-green-900/60 to-teal-900/40",
-  m6: "from-violet-900/60 to-purple-900/40",
-};
+import type { Movie } from "@/lib/types";
 
 export default function HomePage() {
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [loading, setLoading] = useState(true);
   const [heroIndex, setHeroIndex] = useState(0);
   const [autoplay, setAutoplay] = useState(true);
 
   useEffect(() => {
-    if (!autoplay) return;
-    const id = setInterval(() => setHeroIndex((i) => (i + 1) % HERO_MOVIES.length), 5000);
-    return () => clearInterval(id);
-  }, [autoplay]);
+    fetch("/api/movies").then(r => r.json()).then(data => { setMovies(data); setLoading(false); });
+  }, []);
 
-  const heroMovie = HERO_MOVIES[heroIndex];
-  const heroShows = MOCK_SHOWS.filter((s) => s.movieId === heroMovie.id).slice(0, 3);
-  const colorClass = MOVIE_BG_COLORS[heroMovie.id] ?? "from-slate-900/60 to-slate-800/40";
+  const heroMovies = movies.filter((m) => m.status === "now_showing").slice(0, 4);
+  const nowShowing = movies.filter((m) => m.status === "now_showing");
+  const comingSoon = movies.filter((m) => m.status === "coming_soon");
+
+  useEffect(() => {
+    if (!autoplay || heroMovies.length === 0) return;
+    const id = setInterval(() => setHeroIndex((i) => (i + 1) % heroMovies.length), 5000);
+    return () => clearInterval(id);
+  }, [autoplay, heroMovies.length]);
+
+  if (loading) return <div className="pt-16 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>;
+
+  const heroMovie = heroMovies[heroIndex] || heroMovies[0];
+  if (!heroMovie) return <div className="pt-16 min-h-screen" />;
+  const heroShows: any[] = [];
+  const MOVIE_BG_COLORS: Record<string, string> = {};
 
   return (
     <div className="pt-16">
@@ -42,7 +42,7 @@ export default function HomePage() {
           <Image src={heroMovie.backdropUrl} alt={heroMovie.title} fill className="object-cover opacity-50 mix-blend-screen transition-opacity duration-1000" priority />
         )}
         {/* Background gradient */}
-        <div className={`absolute inset-0 bg-gradient-to-r ${colorClass} z-10 transition-all duration-700`} />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/60 to-slate-800/40 z-10 transition-all duration-700" />
         {/* Dark overlay bottom */}
         <div className="absolute inset-0 bg-hero-gradient z-10" />
         {/* Mesh bg */}
@@ -121,7 +121,7 @@ export default function HomePage() {
 
             {/* Thumbnail selector */}
             <div className="flex lg:flex-col gap-3 items-end lg:items-end justify-start lg:justify-end">
-              {HERO_MOVIES.map((m, i) => (
+              {heroMovies.map((m, i) => (
                 <button
                   key={m.id}
                   onClick={() => { setHeroIndex(i); setAutoplay(false); }}
@@ -144,7 +144,7 @@ export default function HomePage() {
 
           {/* Carousel dots */}
           <div className="flex gap-2 mt-8">
-            {HERO_MOVIES.map((_, i) => (
+            {heroMovies.map((_, i) => (
               <button
                 key={i}
                 onClick={() => { setHeroIndex(i); setAutoplay(false); }}
@@ -158,13 +158,13 @@ export default function HomePage() {
 
         {/* Prev/Next arrows */}
         <button
-          onClick={() => { setHeroIndex((i) => (i - 1 + HERO_MOVIES.length) % HERO_MOVIES.length); setAutoplay(false); }}
+          onClick={() => { setHeroIndex((i) => (i - 1 + heroMovies.length) % heroMovies.length); setAutoplay(false); }}
           className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/50 hover:bg-amber-500/20 border border-white/20 hover:border-amber-500/50 flex items-center justify-center transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
         <button
-          onClick={() => { setHeroIndex((i) => (i + 1) % HERO_MOVIES.length); setAutoplay(false); }}
+          onClick={() => { setHeroIndex((i) => (i + 1) % heroMovies.length); setAutoplay(false); }}
           className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/50 hover:bg-amber-500/20 border border-white/20 hover:border-amber-500/50 flex items-center justify-center transition-colors"
         >
           <ChevronRight className="w-5 h-5" />
@@ -183,7 +183,7 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {NOW_SHOWING.map((movie) => (
+          {nowShowing.map((movie) => (
             <MovieCard key={movie.id} movie={movie} />
           ))}
         </div>
@@ -247,7 +247,7 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-6">
-          {COMING_SOON.map((movie) => (
+          {comingSoon.map((movie) => (
             <MovieCard key={movie.id} movie={movie} comingSoon />
           ))}
         </div>
