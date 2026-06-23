@@ -1,5 +1,5 @@
-import { Mail, Phone, MapPin, Clock, MessageSquare } from "lucide-react";
-import Link from "next/link";
+"use client";
+import { Mail, Phone, MapPin, MessageSquare } from "lucide-react";
 
 export default function ContactPage() {
   return (
