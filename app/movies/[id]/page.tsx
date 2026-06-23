@@ -37,6 +37,8 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
   const showGroups = groupShowsByDate(shows);
   const dates = Object.keys(showGroups);
 
+  const dayShows = selectedDate ? (showGroups[selectedDate] ?? []) : [];
+
   useEffect(() => {
     if (dates.length > 0 && !selectedDate) setSelectedDate(dates[0]);
   }, [dates, selectedDate]);
