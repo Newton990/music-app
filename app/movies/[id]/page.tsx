@@ -24,6 +24,7 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
   const router = useRouter();
   const [movie, setMovie] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState("");
 
   useEffect(() => {
     fetch(`/api/movies/${id}`).then(r => r.json()).then(data => { setMovie(data?.error ? null : data); setLoading(false); }).catch(() => setLoading(false));
@@ -35,10 +36,10 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
   const shows = movie.shows || [];
   const showGroups = groupShowsByDate(shows);
   const dates = Object.keys(showGroups);
-  const [selectedDate, setSelectedDate] = useState("");
 
-  const dayShows = selectedDate ? (showGroups[selectedDate] ?? []) : [];
-  if (dates.length > 0 && !selectedDate) setSelectedDate(dates[0]);
+  useEffect(() => {
+    if (dates.length > 0 && !selectedDate) setSelectedDate(dates[0]);
+  }, [dates, selectedDate]);
 
   return (
     <div className="pt-16 min-h-screen">
