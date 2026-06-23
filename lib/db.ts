@@ -2,14 +2,34 @@ import mysql from "mysql2/promise";
 
 let pool: mysql.Pool | null = null;
 
+function parseUrl(url: string) {
+  const u = new URL(url);
+  return {
+    host: u.hostname,
+    port: parseInt(u.port || "3306", 10),
+    user: decodeURIComponent(u.username),
+    password: decodeURIComponent(u.password),
+    database: u.pathname.replace(/^\//, ""),
+  };
+}
+
 export function getPool(): mysql.Pool {
   if (!pool) {
+    const raw = process.env.DATABASE_URL;
+    if (!raw) throw new Error("DATABASE_URL is not set");
+    const { host, port, user, password, database } = parseUrl(raw);
     pool = mysql.createPool({
-      uri: process.env.DATABASE_URL,
+      host,
+      port,
+      user,
+      password,
+      database,
       ssl: {},
       waitForConnections: true,
-      connectionLimit: 10,
+      connectionLimit: 5,
       queueLimit: 0,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 10000,
     });
   }
   return pool;
