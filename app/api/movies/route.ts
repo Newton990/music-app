@@ -1,30 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
+function parseMovie(m: any) {
+  return {
+    ...m,
+    genre: typeof m.genre === "string" ? JSON.parse(m.genre) : m.genre,
+    cast: typeof m.cast === "string" ? JSON.parse(m.cast) : (m.cast || []),
+  };
+}
+
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const status = searchParams.get("status");
-  const genre = searchParams.get("genre");
-  const search = searchParams.get("search");
+  try {
+    const { searchParams } = new URL(req.url);
+    const status = searchParams.get("status");
+    const genre = searchParams.get("genre");
+    const search = searchParams.get("search");
 
-  let sql = "SELECT * FROM Movie WHERE 1=1";
-  const params: any[] = [];
+    let sql = "SELECT * FROM Movie WHERE 1=1";
+    const params: any[] = [];
 
-  if (status) {
-    sql += " AND status = ?";
-    params.push(status);
+    if (status) {
+      sql += " AND status = ?";
+      params.push(status);
+    }
+    if (genre) {
+      sql += " AND genre LIKE ?";
+      params.push(`%"${genre}"%`);
+    }
+    if (search) {
+      sql += " AND (title LIKE ? OR description LIKE ?)";
+      params.push(`%${search}%`, `%${search}%`);
+    }
+
+    sql += " ORDER BY status, releaseDate DESC";
+
+    const movies = await query<any[]>(sql, params);
+    return NextResponse.json(movies.map(parseMovie));
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
   }
-  if (genre) {
-    sql += " AND genre LIKE ?";
-    params.push(`%"${genre}"%`);
-  }
-  if (search) {
-    sql += " AND (title LIKE ? OR description LIKE ?)";
-    params.push(`%${search}%`, `%${search}%`);
-  }
-
-  sql += " ORDER BY status, releaseDate DESC";
-
-  const movies = await query<any[]>(sql, params);
-  return NextResponse.json(movies.map(m => ({ ...m, genre: typeof m.genre === "string" ? JSON.parse(m.genre) : m.genre })));
 }

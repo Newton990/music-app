@@ -26,7 +26,7 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/movies/${id}`).then(r => r.json()).then(data => { setMovie(data); setLoading(false); });
+    fetch(`/api/movies/${id}`).then(r => r.json()).then(data => { setMovie(data?.error ? null : data); setLoading(false); }).catch(() => setLoading(false));
   }, [id]);
 
   if (loading) return <div className="pt-16 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>;

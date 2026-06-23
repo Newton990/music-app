@@ -14,7 +14,10 @@ export default function HomePage() {
   const [autoplay, setAutoplay] = useState(true);
 
   useEffect(() => {
-    fetch("/api/movies").then(r => r.json()).then(data => { setMovies(data); setLoading(false); });
+    fetch("/api/movies")
+      .then(r => r.json())
+      .then(data => { setMovies(Array.isArray(data) ? data : []); setLoading(false); })
+      .catch(() => setLoading(false));
   }, []);
 
   const heroMovies = movies.filter((m) => m.status === "now_showing").slice(0, 4);

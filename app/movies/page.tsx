@@ -14,7 +14,7 @@ export default function MoviesPage() {
   const [status, setStatus] = useState<"all" | "now_showing" | "coming_soon">("all");
 
   useEffect(() => {
-    fetch("/api/movies").then(r => r.json()).then(data => { setMovies(data); setLoading(false); });
+    fetch("/api/movies").then(r => r.json()).then(data => { setMovies(Array.isArray(data) ? data : []); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
   const filtered = movies.filter((m) => {
