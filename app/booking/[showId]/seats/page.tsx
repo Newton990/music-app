@@ -21,15 +21,19 @@ export default function SeatSelectionPage({ params }: { params: { showId: string
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
 
   useEffect(() => {
+    let cancelled = false;
     Promise.all([
       fetch(`/api/shows/${showId}`).then(r => r.json()),
       getShowReservedSeats(showId),
     ]).then(([showData, reserved]) => {
+      if (cancelled) return;
+      if (showData?.error) { setLoading(false); return; }
       setShow(showData);
       setSeats(showData.seats || []);
       setReservedIds(reserved);
       setLoading(false);
-    });
+    }).catch(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [showId]);
 
   if (loading) return <div className="pt-24 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>;

@@ -35,7 +35,7 @@ function PaymentContent({ showId }: { showId: string }) {
       return;
     }
     if (bookingId) {
-      fetch(`/api/bookings/${bookingId}`).then(r => r.json()).then(data => { setBooking(data); setLoading(false); });
+      fetch(`/api/bookings/${bookingId}`).then(r => r.json()).then(data => { setBooking(data); setLoading(false); }).catch(() => setLoading(false));
     } else {
       setLoading(false);
     }
