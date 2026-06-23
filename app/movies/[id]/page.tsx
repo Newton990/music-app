@@ -30,6 +30,14 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
     fetch(`/api/movies/${id}`).then(r => r.json()).then(data => { setMovie(data?.error ? null : data); setLoading(false); }).catch(() => setLoading(false));
   }, [id]);
 
+  useEffect(() => {
+    if (movie?.shows) {
+      const g = groupShowsByDate(movie.shows);
+      const d = Object.keys(g);
+      if (d.length > 0 && !selectedDate) setSelectedDate(d[0]);
+    }
+  }, [movie, selectedDate]);
+
   if (loading) return <div className="pt-16 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>;
   if (!movie) return notFound();
 
@@ -38,10 +46,6 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
   const dates = Object.keys(showGroups);
 
   const dayShows = selectedDate ? (showGroups[selectedDate] ?? []) : [];
-
-  useEffect(() => {
-    if (dates.length > 0 && !selectedDate) setSelectedDate(dates[0]);
-  }, [dates, selectedDate]);
 
   return (
     <div className="pt-16 min-h-screen">
