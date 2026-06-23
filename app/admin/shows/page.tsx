@@ -19,9 +19,12 @@ export default function AdminShowsPage() {
       const [showsRes, moviesRes, screensRes] = await Promise.all([
         fetch("/api/admin/shows"), fetch("/api/admin/movies"), fetch("/api/admin/screens"),
       ]);
-      setShows(await showsRes.json());
-      setMovies(await moviesRes.json());
-      setScreens(await screensRes.json());
+      const showsData = await showsRes.json();
+      const moviesData = await moviesRes.json();
+      const screensData = await screensRes.json();
+      setShows(Array.isArray(showsData) ? showsData : []);
+      setMovies(Array.isArray(moviesData) ? moviesData : []);
+      setScreens(Array.isArray(screensData) ? screensData : []);
     } catch { toast.error("Failed to load data"); }
     setLoading(false);
   };

@@ -14,8 +14,10 @@ export default function AdminScreensPage() {
   const load = async () => {
     try {
       const [screensRes, cinemasRes] = await Promise.all([fetch("/api/admin/screens"), fetch("/api/cinemas")]);
-      setScreens(await screensRes.json());
-      setCinemas(await cinemasRes.json());
+      const screensData = await screensRes.json();
+      const cinemasData = await cinemasRes.json();
+      setScreens(Array.isArray(screensData) ? screensData : []);
+      setCinemas(Array.isArray(cinemasData) ? cinemasData : []);
     } catch { toast.error("Failed to load data"); }
     setLoading(false);
   };

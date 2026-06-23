@@ -19,7 +19,7 @@ export default function AdminMoviesPage() {
     try {
       const res = await fetch("/api/admin/movies");
       const data = await res.json();
-      setMovies(data);
+      setMovies(Array.isArray(data) ? data : []);
     } catch { toast.error("Failed to load movies"); }
     setLoading(false);
   };
