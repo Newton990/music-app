@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { query, getOne } from "@/lib/db";
 import { initializePayment } from "@/lib/paynecta";
+import { sendTicketEmail } from "@/lib/email";
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
@@ -46,7 +47,39 @@ export async function POST(req: Request) {
     "INSERT INTO Payment (id, bookingId, amount, method, status, transactionRef, paidAt) VALUES (?,?,?,?,'success',?,NOW())",
     [`py${Date.now()}`, bookingId, booking.totalAmount, method || "mpesa", ref]
   );
-  await query("UPDATE Booking SET status = 'confirmed', qrCode = ? WHERE id = ?", [`BK-${ref}`, bookingId]);
+  const qrCode = `BK-${ref}`;
+  await query("UPDATE Booking SET status = 'confirmed', qrCode = ? WHERE id = ?", [qrCode, bookingId]);
+
+  // Send ticket email (fire-and-forget)
+  sendTicketEmailFromBooking(booking, qrCode, session).catch(console.error);
 
   return NextResponse.json({ success: true, transactionRef: ref, simulated: true });
+}
+
+async function sendTicketEmailFromBooking(booking: any, qrCode: string, session: any) {
+  try {
+    const show = await getOne<any>("SELECT * FROM Show WHERE id = ?", [booking.showId]);
+    const movie = await getOne<any>("SELECT * FROM Movie WHERE id = ?", [booking.movieId]);
+    const cinema = await getOne<any>("SELECT * FROM Cinema WHERE id = ?", [booking.cinemaId]);
+    const screen = await getOne<any>("SELECT * FROM Screen WHERE id = ?", [booking.screenId]);
+    if (!show || !movie || !cinema || !screen) return;
+
+    const seats = JSON.parse(booking.seats || "[]");
+    const user = session.user;
+
+    await sendTicketEmail({
+      email: user.email,
+      name: user.name || "Valued Customer",
+      movieTitle: movie.title,
+      cinemaName: cinema.name,
+      screenName: screen.name,
+      showTime: show.startTime,
+      seats: seats.map((s: any) => ({ row: s.row || "", col: s.col || 0, type: s.type || "standard" })),
+      qrCode,
+      totalAmount: booking.totalAmount,
+      bookingRef: booking.id,
+    });
+  } catch (err) {
+    console.error("Failed to send ticket email:", err);
+  }
 }

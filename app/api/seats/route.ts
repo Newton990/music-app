@@ -23,8 +23,14 @@ export async function GET(req: NextRequest) {
     [show[0].screenId]
   );
 
+  await query(
+    "UPDATE Booking SET status = 'cancelled' WHERE showId = ? AND status = 'pending' AND createdAt < NOW() - INTERVAL 10 MINUTE",
+    [showId]
+  );
+
   const bookings = await query<any[]>(
-    "SELECT seats FROM Booking WHERE showId = ? AND status IN ('pending', 'confirmed')",
+    `SELECT seats FROM Booking
+     WHERE showId = ? AND ((status = 'pending' AND createdAt >= NOW() - INTERVAL 10 MINUTE) OR status = 'confirmed')`,
     [showId]
   );
 

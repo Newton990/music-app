@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get("status");
     const genre = searchParams.get("genre");
     const search = searchParams.get("search");
+    const date = searchParams.get("date");
 
     let sql = "SELECT * FROM Movie WHERE 1=1";
     const params: any[] = [];
@@ -33,8 +34,15 @@ export async function GET(req: NextRequest) {
       sql += " AND (title LIKE ? OR description LIKE ?)";
       params.push(`%${search}%`, `%${search}%`);
     }
+    if (date) {
+      sql = `SELECT DISTINCT m.* FROM Movie m JOIN \`Show\` sh ON sh.movieId = m.id WHERE DATE(sh.startTime) = ?`;
+      params.push(date);
+      if (status) { sql += " AND m.status = ?"; params.push(status); }
+      if (genre) { sql += " AND m.genre LIKE ?"; params.push(`%"${genre}"%`); }
+      if (search) { sql += " AND (m.title LIKE ? OR m.description LIKE ?)"; params.push(`%${search}%`, `%${search}%`); }
+    }
 
-    sql += " ORDER BY status, releaseDate DESC";
+    sql += date ? " ORDER BY m.status, m.releaseDate DESC" : " ORDER BY status, releaseDate DESC";
 
     const movies = await query<any[]>(sql, params);
     return NextResponse.json(movies.map(parseMovie));

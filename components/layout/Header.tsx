@@ -98,11 +98,11 @@ export default function Header() {
                     </div>
                     <div className="py-1">
                       <Link
-                        href="/dashboard"
+                        href={user.role === "admin" ? "/admin" : "/dashboard"}
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
                       >
-                        <LayoutDashboard className="w-4 h-4 text-amber-400" />
-                        My Dashboard
+                        <ShieldCheck className="w-4 h-4 text-amber-400" />
+                        {user.role === "admin" ? "Admin Dashboard" : "My Dashboard"}
                       </Link>
                       <Link
                         href="/dashboard"
@@ -174,8 +174,8 @@ export default function Header() {
             <div className="pt-3 border-t border-cinema-border flex flex-col gap-2">
               {user ? (
                 <>
-                  <Link href="/dashboard" className="btn-outline-gold text-sm text-center">
-                    My Dashboard
+                  <Link href={user.role === "admin" ? "/admin" : "/dashboard"} className="btn-outline-gold text-sm text-center">
+                    {user.role === "admin" ? "Admin Dashboard" : "My Dashboard"}
                   </Link>
                   <button onClick={handleLogout} className="text-red-400 text-sm py-2">
                     Sign Out

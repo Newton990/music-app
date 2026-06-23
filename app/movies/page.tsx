@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Search } from "lucide-react";
+import { Search, Calendar, X } from "lucide-react";
 import MovieCard from "@/components/movies/MovieCard";
 import type { Movie } from "@/lib/types";
 
@@ -12,10 +12,14 @@ export default function MoviesPage() {
   const [search, setSearch] = useState("");
   const [genre, setGenre] = useState("All");
   const [status, setStatus] = useState<"all" | "now_showing" | "coming_soon">("all");
+  const [date, setDate] = useState("");
 
   useEffect(() => {
-    fetch("/api/movies").then(r => r.json()).then(data => { setMovies(Array.isArray(data) ? data : []); setLoading(false); }).catch(() => setLoading(false));
-  }, []);
+    const params = new URLSearchParams();
+    if (date) params.set("date", date);
+    const qs = params.toString();
+    fetch(`/api/movies${qs ? `?${qs}` : ""}`).then(r => r.json()).then(data => { setMovies(Array.isArray(data) ? data : []); setLoading(false); }).catch(() => setLoading(false));
+  }, [date]);
 
   const filtered = movies.filter((m) => {
     const matchSearch = !search || m.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -47,6 +51,25 @@ export default function MoviesPage() {
             onChange={(e) => setSearch(e.target.value)}
             className="input-cinema pl-10"
           />
+        </div>
+
+        {/* Date filter */}
+        <div className="relative">
+          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="input-cinema pl-10 pr-10 w-44"
+          />
+          {date && (
+            <button
+              onClick={() => setDate("")}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         {/* Status filter */}
@@ -87,6 +110,11 @@ export default function MoviesPage() {
       {/* Results count */}
       <p className="text-slate-400 text-sm mb-6">
         {filtered.length} movie{filtered.length !== 1 ? "s" : ""} found
+        {date && (
+          <span className="text-amber-400 ml-2">
+            · Showing movies with shows on {new Date(date + "T00:00:00").toLocaleDateString("en-KE", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
+          </span>
+        )}
       </p>
 
       {/* Grid */}

@@ -6,6 +6,8 @@ import type { User } from "@/lib/types";
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  loginWithOtp: (phone: string) => Promise<{ step: "send" }>;
+  verifyOtp: (phone: string, otp: string) => Promise<{ success: boolean; error?: string }>;
   register: (data: { name: string; email: string; phone: string; password: string }) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   isLoading: boolean;
@@ -42,6 +44,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const loginWithOtp = async (phone: string) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/auth/otp/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+      });
+      const json = await res.json();
+      setIsLoading(false);
+      if (!res.ok) throw new Error(json.error || "Failed to send OTP");
+      return { step: "send" as const };
+    } catch {
+      setIsLoading(false);
+      throw new Error("Failed to send OTP");
+    }
+  };
+
+  const verifyOtp = async (phone: string, otp: string) => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/auth/otp/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, otp }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setIsLoading(false);
+        return { success: false, error: json.error || "Invalid OTP" };
+      }
+      const result = await signIn("credentials", {
+        email: json.user.email,
+        password: "__otp__",
+        redirect: false,
+      });
+      setIsLoading(false);
+      if (result?.error) return { success: false, error: "Login failed after OTP verification." };
+      return { success: true };
+    } catch {
+      setIsLoading(false);
+      return { success: false, error: "Verification failed. Please try again." };
+    }
+  };
+
   const register = async (data: { name: string; email: string; phone: string; password: string }) => {
     setIsLoading(true);
     try {
@@ -73,6 +120,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         login,
+        loginWithOtp,
+        verifyOtp,
         register,
         logout,
         isLoading: isLoading || status === "loading",

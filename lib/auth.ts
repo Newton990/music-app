@@ -12,7 +12,19 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        if (!credentials?.email) return null;
+
+        // OTP login bypass — password checked server-side before calling signIn
+        if (credentials.password === "__otp__") {
+          const user = await getOne<any>(
+            "SELECT id, name, email, phone, role FROM User WHERE email = ?",
+            [credentials.email]
+          );
+          if (!user) return null;
+          return { id: user.id, name: user.name, email: user.email, phone: user.phone, role: user.role };
+        }
+
+        if (!credentials?.password) return null;
         const user = await getOne<any>(
           "SELECT id, name, email, password, phone, role FROM User WHERE email = ?",
           [credentials.email]

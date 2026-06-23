@@ -51,3 +51,19 @@ export async function execute(sql: string, params?: any[]): Promise<{ insertId?:
   const [result] = await p.execute(sql, params || []);
   return result as any;
 }
+
+export async function transaction<T>(callback: (conn: mysql.PoolConnection) => Promise<T>): Promise<T> {
+  const pool = getPool();
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    const result = await callback(conn);
+    await conn.commit();
+    return result;
+  } catch (error) {
+    await conn.rollback();
+    throw error;
+  } finally {
+    conn.release();
+  }
+}

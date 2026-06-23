@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Smartphone, CreditCard, Wallet, ArrowLeft, Shield, CheckCircle, XCircle } from "lucide-react";
 import { useBooking } from "@/context/booking-context";
+import { useAuth } from "@/context/auth-context";
 import { formatCurrency, formatTime, formatDate } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { Suspense } from "react";
@@ -14,6 +15,7 @@ function PaymentContent({ showId }: { showId: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const bookingId = searchParams.get("bookingId") ?? "";
+  const { user } = useAuth();
   const { processPayment } = useBooking();
 
   const [booking, setBooking] = useState<any>(null);
@@ -28,12 +30,16 @@ function PaymentContent({ showId }: { showId: string }) {
   const [txRef, setTxRef] = useState("");
 
   useEffect(() => {
+    if (!user) {
+      router.push(`/login?redirect=/booking/${showId}/payment${bookingId ? `?bookingId=${bookingId}` : ""}`);
+      return;
+    }
     if (bookingId) {
       fetch(`/api/bookings/${bookingId}`).then(r => r.json()).then(data => { setBooking(data); setLoading(false); });
     } else {
       setLoading(false);
     }
-  }, [bookingId]);
+  }, [bookingId, user, router, showId]);
 
   if (loading) return <div className="pt-24 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>;
   if (!booking) {
