@@ -1,11 +1,9 @@
 // ============================================
-// NMstream – v1.5  (CORS Proxy + fetch)
+// NMstream – v1.6  (Deezer API)
 // ============================================
 
-const JAMENDO_CLIENT_ID = '56d30cce';
-const JAMENDO_BASE      = 'https://api.jamendo.com/v3.0/tracks/';
-const CORS_PROXY        = 'https://corsproxy.io/?';
-const ROW_LIMIT         = 20;
+const DEEZER_BASE  = 'https://api.deezer.com';
+const ROW_LIMIT    = 20;
 
 const SAMPLE_TRACKS = [
     {
@@ -112,53 +110,38 @@ let activeSearchTracks = [];
 // ============================================
 const getEl = id => document.getElementById(id);
 
-function buildJamendoUrl(tag = '', query = '', limit = ROW_LIMIT, offset = 0) {
-    let url = `${JAMENDO_BASE}?client_id=${JAMENDO_CLIENT_ID}`
-            + `&format=json&limit=${limit}&offset=${offset}`
-            + `&include=musicinfo&imagesize=400&order=popularity_total`;
-    if (tag)   url += `&tags=${encodeURIComponent(tag)}`;
-    if (query) url += `&search=${encodeURIComponent(query)}`;
-    return url;
+function buildDeezerUrl(tag = '', query = '', limit = ROW_LIMIT) {
+    if (!tag && !query) {
+        return `${DEEZER_BASE}/chart/0/tracks?limit=${limit}`;
+    }
+    const searchQuery = query || tag;
+    return `${DEEZER_BASE}/search?q=${encodeURIComponent(searchQuery)}&limit=${limit}&order=RANKING`;
 }
 
-async function jamendoFetch(tag = '', query = '', limit = ROW_LIMIT, offset = 0) {
-    const apiUrl   = buildJamendoUrl(tag, query, limit, offset);
-    const proxyUrl = CORS_PROXY + encodeURIComponent(apiUrl);
-
-    async function parseResponse(res) {
+async function deezerFetch(tag = '', query = '', limit = ROW_LIMIT) {
+    const url = buildDeezerUrl(tag, query, limit);
+    try {
+        const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        if (data.error || data.headers?.status === 'failed') {
-            throw new Error(data.error || data.headers?.error_message || 'Jamendo API error');
-        }
-        return data.results || [];
-    }
-
-    try {
-        const res = await fetch(proxyUrl);
-        return await parseResponse(res);
+        if (data.error) throw new Error(data.error.message || 'Deezer API error');
+        return data.data || [];
     } catch (err) {
-        console.warn('Jamendo proxy fetch failed:', err);
-        try {
-            const direct = await fetch(apiUrl);
-            return await parseResponse(direct);
-        } catch (fallbackErr) {
-            console.error('Jamendo direct fetch failed:', fallbackErr);
-            return null;   // null = network or API error
-        }
+        console.error('Deezer fetch failed:', err);
+        return null;
     }
 }
 
 function mapTrack(item) {
     return {
         id:          item.id,
-        title:       item.name || item.title,
-        artist:      item.artist_name || item.artist,
-        cover:       item.cover || item.image || item.album_image || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop',
-        url:         item.url || item.audio,
-        albumId:     item.album_id || item.albumId || null,
-        albumTitle:  item.album_name || item.albumTitle || null,
-        albumCover:  item.albumCover || item.album_image || item.image || item.cover || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop'
+        title:       item.title,
+        artist:      item.artist?.name || 'Unknown Artist',
+        cover:       item.album?.cover_medium || item.album?.cover || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop',
+        url:         item.preview,
+        albumId:     item.album?.id || null,
+        albumTitle:  item.album?.title || null,
+        albumCover:  item.album?.cover_medium || item.album?.cover || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop'
     };
 }
 
@@ -204,7 +187,7 @@ async function loadGenreRow(tag, index) {
     const scroll = getEl(`rowScroll-${index}`);
     if (!scroll) return;
 
-    let results = await jamendoFetch(tag);
+    let results = await deezerFetch(tag);
     if (results === null || results.length === 0) {
         const fallback = getFallbackTracks(tag);
         if (fallback.length > 0) {
@@ -298,7 +281,7 @@ async function doSearch(query) {
     if (!container) return;
     container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Searching…</div>';
 
-    const results = await jamendoFetch('', query, 40);
+    const results = await deezerFetch('', query, 40);
 
     if (results === null || results.length === 0) {
         const fallback = getFallbackTracks('', query);
@@ -440,7 +423,7 @@ function setupNavigation() {
                 container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading…</div>';
             }
 
-            const results = await jamendoFetch(tag, '', 60);
+            const results = await deezerFetch(tag, '', 60);
             if (!container) return;
 
             if (!results || results.length === 0) {
