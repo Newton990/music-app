@@ -51,7 +51,7 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
     <div className="pt-16 min-h-screen">
       {/* Hero */}
       <div className="relative min-h-[50vh] flex items-end overflow-hidden bg-slate-900">
-        <Image src={movie.backdropUrl || movie.posterUrl} alt={movie.title} fill className="object-cover opacity-40 mix-blend-screen" priority />
+        <Image src={movie.backdropUrl || movie.posterUrl} alt={movie.title} fill className="object-cover opacity-60" priority />
         <div className="absolute inset-0 bg-hero-gradient z-10" />
 
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 w-full">

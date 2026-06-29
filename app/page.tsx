@@ -42,7 +42,7 @@ export default function HomePage() {
       {/* ─── HERO ──────────────────────────────────────────────────────────────── */}
       <section className="relative min-h-[80vh] flex items-end overflow-hidden bg-slate-900">
         {heroMovie.backdropUrl && (
-          <Image src={heroMovie.backdropUrl} alt={heroMovie.title} fill className="object-cover opacity-50 mix-blend-screen transition-opacity duration-1000" priority />
+          <Image src={heroMovie.backdropUrl} alt={heroMovie.title} fill className="object-cover opacity-70 transition-opacity duration-1000" priority />
         )}
         {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-r from-slate-900/60 to-slate-800/40 z-10 transition-all duration-700" />
