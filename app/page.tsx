@@ -49,7 +49,6 @@ export default function HomePage() {
         {/* Dark overlay bottom */}
         <div className="absolute inset-0 bg-hero-gradient z-10" />
         {/* Mesh bg */}
-        <div className="absolute inset-0 bg-cinema-bg" />
         <div className="absolute inset-0 opacity-10"
           style={{ backgroundImage: "radial-gradient(circle at 30% 40%, #2dd4bf 0%, transparent 50%), radial-gradient(circle at 70% 60%, #3b82f6 0%, transparent 50%)" }} />
 
