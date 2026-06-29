@@ -1,8 +1,9 @@
 // ============================================
-// NMstream – v1.6  (Deezer API)
+// NMstream – v1.6  (Deezer API + CORS Proxy)
 // ============================================
 
 const DEEZER_BASE  = 'https://api.deezer.com';
+const CORS_PROXY   = 'https://corsproxy.io/?';
 const ROW_LIMIT    = 20;
 
 const SAMPLE_TRACKS = [
@@ -119,16 +120,27 @@ function buildDeezerUrl(tag = '', query = '', limit = ROW_LIMIT) {
 }
 
 async function deezerFetch(tag = '', query = '', limit = ROW_LIMIT) {
-    const url = buildDeezerUrl(tag, query, limit);
+    const apiUrl = buildDeezerUrl(tag, query, limit);
+    const proxyUrl = CORS_PROXY + encodeURIComponent(apiUrl);
+
     try {
-        const res = await fetch(url);
+        const res = await fetch(proxyUrl);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         if (data.error) throw new Error(data.error.message || 'Deezer API error');
         return data.data || [];
     } catch (err) {
         console.error('Deezer fetch failed:', err);
-        return null;
+        try {
+            const res = await fetch(apiUrl);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            if (data.error) throw new Error(data.error.message || 'Deezer API error');
+            return data.data || [];
+        } catch (directErr) {
+            console.error('Deezer direct fetch failed:', directErr);
+            return null;
+        }
     }
 }
 
@@ -591,24 +603,34 @@ async function prepareDownload(track) {
     if (!track || !track.url) return false;
     if (track.downloadReady && track.downloadUrl) return true;
 
-    try {
-        const response = await fetch(track.url);
-        if (!response.ok) throw new Error(`Download fetch failed: ${response.status}`);
-        const blob = await response.blob();
-        if (activeDownloadUrl) URL.revokeObjectURL(activeDownloadUrl);
-
-        const downloadUrl = URL.createObjectURL(blob);
-        activeDownloadUrl = downloadUrl;
-        track.downloadUrl = downloadUrl;
-        track.downloadReady = true;
-        track.downloadFileName = `${track.artist || 'track'} - ${track.title || 'audio'}.mp3`;
-        showNotification('Music is ready to download.');
-        return true;
-    } catch (error) {
-        console.warn('Download prep failed:', error);
-        showNotification('Could not prefetch the track. Opening the audio link instead.', 'warning');
-        return false;
+    async function tryFetch(url) {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.blob();
     }
+
+    let blob;
+    try {
+        blob = await tryFetch(track.url);
+    } catch {
+        try {
+            const proxyUrl = CORS_PROXY + encodeURIComponent(track.url);
+            blob = await tryFetch(proxyUrl);
+        } catch {
+            console.warn('Download prep failed');
+            showNotification('Could not prefetch the track. Opening the audio link instead.', 'warning');
+            return false;
+        }
+    }
+
+    if (activeDownloadUrl) URL.revokeObjectURL(activeDownloadUrl);
+    const downloadUrl = URL.createObjectURL(blob);
+    activeDownloadUrl = downloadUrl;
+    track.downloadUrl = downloadUrl;
+    track.downloadReady = true;
+    track.downloadFileName = `${track.artist || 'track'} - ${track.title || 'audio'}.mp3`;
+    showNotification('Music is ready to download.');
+    return true;
 }
 
 function triggerDownload(track) {
