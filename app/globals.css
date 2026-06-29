@@ -8,8 +8,8 @@
   --cinema-bg: #080c14;
   --cinema-card: #0f1623;
   --cinema-border: #1e2d45;
-  --cinema-gold: #f5a623;
-  --cinema-gold-light: #fbbf24;
+  --cinema-teal: #2dd4bf;
+  --cinema-teal-light: #14b8a6;
   --cinema-red: #e53e3e;
 }
 
@@ -46,21 +46,21 @@
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #f5a623;
+    background: #2dd4bf;
   }
 }
 
 @layer components {
-  .btn-gold {
-    @apply bg-gradient-to-r from-amber-500 to-amber-400 text-black font-bold px-6 py-3 rounded-xl 
-           hover:from-amber-400 hover:to-amber-300 transition-all duration-300 
-           shadow-[0_0_20px_rgba(245,166,35,0.35)] hover:shadow-[0_0_30px_rgba(245,166,35,0.55)]
+  .btn-teal {
+    @apply bg-gradient-to-r from-teal-500 to-teal-400 text-black font-bold px-6 py-3 rounded-xl 
+           hover:from-teal-400 hover:to-teal-300 transition-all duration-300 
+           shadow-[0_0_20px_rgba(45,212,191,0.35)] hover:shadow-[0_0_30px_rgba(45,212,191,0.55)]
            active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  .btn-outline-gold {
-    @apply border border-amber-500 text-amber-400 font-semibold px-6 py-3 rounded-xl
-           hover:bg-amber-500/10 transition-all duration-300 active:scale-95
+  .btn-outline-teal {
+    @apply border border-teal-500 text-teal-400 font-semibold px-6 py-3 rounded-xl
+           hover:bg-teal-500/10 transition-all duration-300 active:scale-95
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
@@ -75,12 +75,12 @@
 
   .input-cinema {
     @apply w-full bg-[#0a1020] border border-[#1e2d45] rounded-xl px-4 py-3 text-white
-           placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1
-           focus:ring-amber-500/40 transition-all duration-200;
+           placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1
+           focus:ring-teal-500/40 transition-all duration-200;
   }
 
   .badge-genre {
-    @apply text-xs font-medium px-3 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30;
+    @apply text-xs font-medium px-3 py-1 rounded-full bg-teal-500/15 text-teal-400 border border-teal-500/30;
   }
 
   .badge-rating {
@@ -92,7 +92,7 @@
   }
 
   .seat-available {
-    @apply bg-slate-700 border border-slate-600 hover:bg-amber-500/30 hover:border-amber-500 
+    @apply bg-slate-700 border border-slate-600 hover:bg-teal-500/30 hover:border-teal-500 
            cursor-pointer transition-all duration-150 text-slate-300 hover:text-white;
   }
 
@@ -107,7 +107,7 @@
   }
 
   .seat-selected {
-    @apply bg-amber-500 border border-amber-400 text-black font-bold shadow-[0_0_10px_rgba(245,166,35,0.5)];
+    @apply bg-teal-500 border border-teal-400 text-black font-bold shadow-[0_0_10px_rgba(45,212,191,0.5)];
   }
 
   .seat-reserved {
@@ -120,8 +120,8 @@
     animation: shimmer 1.5s infinite;
   }
 
-  .text-gradient-gold {
-    @apply bg-gradient-to-r from-amber-400 to-amber-200 bg-clip-text text-transparent;
+  .text-gradient-teal {
+    @apply bg-gradient-to-r from-teal-400 to-teal-200 bg-clip-text text-transparent;
   }
 
   .section-title {
@@ -139,7 +139,7 @@
 }
 
 .horizontal-scroll::-webkit-scrollbar-thumb {
-  background: #f5a623;
+  background: #2dd4bf;
   border-radius: 2px;
 }
 
@@ -156,13 +156,13 @@
 
 /* Star rating */
 .star-rating span {
-  color: #f5a623;
+  color: #2dd4bf;
 }
 
 /* Loading spinner */
 .spinner {
-  border: 3px solid rgba(245, 166, 35, 0.2);
-  border-top-color: #f5a623;
+  border: 3px solid rgba(45, 212, 191, 0.2);
+  border-top-color: #2dd4bf;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }

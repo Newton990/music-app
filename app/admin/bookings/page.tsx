@@ -55,11 +55,11 @@ export default function AdminBookingsPage() {
         <form onSubmit={handleSearch} className="relative flex-1">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
           <input type="text" placeholder="Search by booking ID, movie, or user..." value={search} onChange={(e) => setSearch(e.target.value)} className="input-cinema pl-11 pr-12" />
-          <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-amber-400 hover:text-amber-300 font-medium px-2 py-1">Search</button>
+          <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-teal-400 hover:text-teal-300 font-medium px-2 py-1">Search</button>
         </form>
         <div className="flex gap-2 flex-wrap">
           {["", "confirmed", "pending", "cancelled", "refunded"].map((s) => (
-            <button key={s} onClick={() => setStatusFilter(s)} className={`text-xs px-3 py-2 rounded-lg border transition-all ${statusFilter === s ? "bg-amber-500/10 border-amber-500/30 text-amber-400" : "border-cinema-border text-slate-400 hover:border-slate-600"}`}>
+            <button key={s} onClick={() => setStatusFilter(s)} className={`text-xs px-3 py-2 rounded-lg border transition-all ${statusFilter === s ? "bg-teal-500/10 border-teal-500/30 text-teal-400" : "border-cinema-border text-slate-400 hover:border-slate-600"}`}>
               {s === "" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
             </button>
           ))}
@@ -94,10 +94,10 @@ export default function AdminBookingsPage() {
                       {b.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-amber-400 font-semibold">{formatCurrency(b.totalAmount)}</td>
+                  <td className="px-4 py-3 text-sm text-teal-400 font-semibold">{formatCurrency(b.totalAmount)}</td>
                   <td className="px-4 py-3 text-xs text-slate-400">{formatDateTime(b.createdAt)}</td>
                   <td className="px-4 py-3 text-right">
-                    <Link href={`/booking/confirmation?bookingId=${b.id}`} className="inline-flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 font-medium">
+                    <Link href={`/booking/confirmation?bookingId=${b.id}`} className="inline-flex items-center gap-1 text-xs text-teal-400 hover:text-teal-300 font-medium">
                       <Eye className="w-3 h-3" /> View
                     </Link>
                   </td>

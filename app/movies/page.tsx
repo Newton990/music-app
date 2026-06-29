@@ -36,7 +36,7 @@ export default function MoviesPage() {
         <h1 className="text-3xl font-black text-white mb-2">
           🎬 All Movies
         </h1>
-        <div className="h-1 w-16 bg-gold-gradient rounded-full" />
+        <div className="h-1 w-16 bg-teal-gradient rounded-full" />
       </div>
 
       {/* Filters */}
@@ -80,8 +80,8 @@ export default function MoviesPage() {
               onClick={() => setStatus(s)}
               className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 status === s
-                  ? "bg-amber-500 text-black"
-                  : "bg-cinema-card border border-cinema-border text-slate-300 hover:border-amber-500/40"
+                  ? "bg-teal-500 text-black"
+                  : "bg-cinema-card border border-cinema-border text-slate-300 hover:border-teal-500/40"
               }`}
             >
               {s === "all" ? "All" : s === "now_showing" ? "Now Showing" : "Coming Soon"}
@@ -98,7 +98,7 @@ export default function MoviesPage() {
             onClick={() => setGenre(g)}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
               genre === g
-                ? "bg-amber-500/20 text-amber-400 border border-amber-500/50"
+                ? "bg-teal-500/20 text-teal-400 border border-teal-500/50"
                 : "bg-cinema-card border border-cinema-border text-slate-400 hover:text-slate-200 hover:border-slate-500"
             }`}
           >
@@ -111,7 +111,7 @@ export default function MoviesPage() {
       <p className="text-slate-400 text-sm mb-6">
         {filtered.length} movie{filtered.length !== 1 ? "s" : ""} found
         {date && (
-          <span className="text-amber-400 ml-2">
+          <span className="text-teal-400 ml-2">
             · Showing movies with shows on {new Date(date + "T00:00:00").toLocaleDateString("en-KE", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
           </span>
         )}

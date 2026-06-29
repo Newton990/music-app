@@ -69,12 +69,12 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-16 pt-24">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl" />
       </div>
 
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-gold-gradient rounded-2xl shadow-gold mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-teal-gradient rounded-2xl shadow-teal mb-4">
             <Film className="w-7 h-7 text-black" />
           </div>
           <h1 className="text-2xl font-black text-white">Welcome Back</h1>
@@ -88,7 +88,7 @@ export default function LoginPage() {
               onClick={() => setTab("email")}
               className={`flex-1 pb-3 text-sm font-semibold transition-colors border-b-2 ${
                 tab === "email"
-                  ? "text-amber-400 border-amber-400"
+                  ? "text-teal-400 border-teal-400"
                   : "text-slate-500 border-transparent hover:text-slate-300"
               }`}
             >
@@ -99,7 +99,7 @@ export default function LoginPage() {
               onClick={() => setTab("phone")}
               className={`flex-1 pb-3 text-sm font-semibold transition-colors border-b-2 ${
                 tab === "phone"
-                  ? "text-amber-400 border-amber-400"
+                  ? "text-teal-400 border-teal-400"
                   : "text-slate-500 border-transparent hover:text-slate-300"
               }`}
             >
@@ -149,7 +149,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn-gold w-full py-3.5 flex items-center justify-center gap-2"
+                className="btn-teal w-full py-3.5 flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <><div className="w-4 h-4 spinner" /> Signing in...</>
@@ -183,7 +183,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={handleSendOtp}
                   disabled={otpLoading}
-                  className="btn-gold w-full py-3.5 flex items-center justify-center gap-2"
+                  className="btn-teal w-full py-3.5 flex items-center justify-center gap-2"
                 >
                   {otpLoading ? (
                     <><div className="w-4 h-4 spinner" /> Sending OTP...</>
@@ -210,7 +210,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={handleVerifyOtp}
                     disabled={otpLoading}
-                    className="btn-gold w-full py-3.5 flex items-center justify-center gap-2"
+                    className="btn-teal w-full py-3.5 flex items-center justify-center gap-2"
                   >
                     {otpLoading ? (
                       <><div className="w-4 h-4 spinner" /> Verifying...</>
@@ -234,7 +234,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-slate-400 mt-5">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-amber-400 hover:text-amber-300 font-semibold">
+          <Link href="/register" className="text-teal-400 hover:text-teal-300 font-semibold">
             Sign up free
           </Link>
         </p>

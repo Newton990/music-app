@@ -89,7 +89,7 @@ export default function AdminShowsPage() {
           <h1 className="text-2xl font-black text-white">Shows</h1>
           <p className="text-slate-400 text-sm mt-1">Manage movie showtimes</p>
         </div>
-        <button onClick={() => { setEditing(null); setForm({ movieId: "", screenId: "", cinemaId: "", startTime: "", price: "", vipPrice: "", premiumPrice: "" }); setShowForm(true); }} className="btn-gold text-sm px-5 py-2.5 flex items-center gap-2 w-fit">
+        <button onClick={() => { setEditing(null); setForm({ movieId: "", screenId: "", cinemaId: "", startTime: "", price: "", vipPrice: "", premiumPrice: "" }); setShowForm(true); }} className="btn-teal text-sm px-5 py-2.5 flex items-center gap-2 w-fit">
           <Plus className="w-4 h-4" /> Add Show
         </button>
       </div>
@@ -116,8 +116,8 @@ export default function AdminShowsPage() {
                 <div><label className="text-xs text-slate-400 mb-1 block">Premium Price</label><input type="number" value={form.premiumPrice} onChange={(e) => setForm({ ...form, premiumPrice: e.target.value })} className="input-cinema" /></div>
               </div>
               <div className="flex gap-3 pt-4">
-                <button type="submit" className="btn-gold flex-1">{editing ? "Update Show" : "Create Show"}</button>
-                <button type="button" onClick={() => { setShowForm(false); setEditing(null); }} className="btn-outline-gold flex-1">Cancel</button>
+                <button type="submit" className="btn-teal flex-1">{editing ? "Update Show" : "Create Show"}</button>
+                <button type="button" onClick={() => { setShowForm(false); setEditing(null); }} className="btn-outline-teal flex-1">Cancel</button>
               </div>
             </form>
           </div>
@@ -152,10 +152,10 @@ export default function AdminShowsPage() {
                   </td>
                   <td className="px-4 py-3 text-sm text-slate-300">{show.screenName}</td>
                   <td className="px-4 py-3 text-sm text-slate-300">{formatDateTime(show.startTime)}</td>
-                  <td className="px-4 py-3 text-sm text-amber-400 font-semibold">{formatCurrency(show.price)}</td>
+                  <td className="px-4 py-3 text-sm text-teal-400 font-semibold">{formatCurrency(show.price)}</td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => startEdit(show)} className="p-2 hover:bg-white/5 rounded-lg transition-colors"><Edit2 className="w-4 h-4 text-slate-400 hover:text-amber-400" /></button>
+                      <button onClick={() => startEdit(show)} className="p-2 hover:bg-white/5 rounded-lg transition-colors"><Edit2 className="w-4 h-4 text-slate-400 hover:text-teal-400" /></button>
                       <button onClick={() => handleDelete(show.id)} className="p-2 hover:bg-white/5 rounded-lg transition-colors"><Trash2 className="w-4 h-4 text-slate-400 hover:text-red-400" /></button>
                     </div>
                   </td>

@@ -20,12 +20,12 @@ function ConfirmationContent() {
     }
   }, [bookingId]);
 
-  if (loading) return <div className="pt-24 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return <div className="pt-24 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" /></div>;
   if (!booking) {
     return (
       <div className="pt-24 text-center">
         <p className="text-slate-400">Booking not found.</p>
-        <button onClick={() => router.push("/")} className="btn-gold mt-4">Go Home</button>
+        <button onClick={() => router.push("/")} className="btn-teal mt-4">Go Home</button>
       </div>
     );
   }
@@ -57,7 +57,7 @@ function ConfirmationContent() {
 
         <div className="bg-cinema-bg rounded-xl p-5 border border-cinema-border mb-4">
           <div className="flex items-center gap-3 mb-4">
-            <Ticket className="w-5 h-5 text-amber-400" />
+            <Ticket className="w-5 h-5 text-teal-400" />
             <div>
               <p className="text-lg font-bold text-white">{booking.movieTitle}</p>
               <p className="text-xs text-slate-400">{booking.cinemaName} · {booking.screenName}</p>
@@ -66,14 +66,14 @@ function ConfirmationContent() {
 
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
+              <Calendar className="w-4 h-4 text-teal-400 shrink-0" />
               <div>
                 <p className="text-xs text-slate-500">Date</p>
                 <p className="text-sm text-white font-semibold">{formatDate(booking.startTime)}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
+              <Calendar className="w-4 h-4 text-teal-400 shrink-0" />
               <div>
                 <p className="text-xs text-slate-500">Time</p>
                 <p className="text-sm text-white font-semibold">{formatTime(booking.startTime)}</p>
@@ -82,7 +82,7 @@ function ConfirmationContent() {
           </div>
 
           <div className="flex items-center gap-2 mb-4">
-            <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
+            <MapPin className="w-4 h-4 text-teal-400 shrink-0" />
             <div>
               <p className="text-xs text-slate-500">Location</p>
               <p className="text-sm text-white font-semibold">{booking.cinemaName}</p>
@@ -93,7 +93,7 @@ function ConfirmationContent() {
             <p className="text-xs text-slate-500 mb-2">Seats</p>
             <div className="flex flex-wrap gap-2">
               {seats.map((s: any) => (
-                <span key={s.seatId} className="px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-sm font-bold text-amber-400">{s.seatId.split("-").slice(-1)[0]}</span>
+                <span key={s.seatId} className="px-3 py-1.5 bg-teal-500/10 border border-teal-500/30 rounded-lg text-sm font-bold text-teal-400">{s.seatId.split("-").slice(-1)[0]}</span>
               ))}
             </div>
           </div>
@@ -116,7 +116,7 @@ function ConfirmationContent() {
         <div className="flex justify-between items-center border-t border-cinema-border pt-4">
           <div>
             <p className="text-xs text-slate-500">Total Paid</p>
-            <p className="text-xl font-black text-amber-400">{formatCurrency(booking.totalAmount)}</p>
+            <p className="text-xl font-black text-teal-400">{formatCurrency(booking.totalAmount)}</p>
           </div>
           {booking.transactionRef && (
             <div className="text-right">
@@ -128,7 +128,7 @@ function ConfirmationContent() {
       </div>
 
       <div className="flex flex-col gap-3">
-        <Link href="/dashboard" className="btn-gold flex items-center justify-center gap-2 py-4">
+        <Link href="/dashboard" className="btn-teal flex items-center justify-center gap-2 py-4">
           <Home className="w-4 h-4" /> Go to Dashboard
         </Link>
       </div>

@@ -92,7 +92,7 @@ export default function AdminMoviesPage() {
           <h1 className="text-2xl font-black text-white">Movies</h1>
           <p className="text-slate-400 text-sm mt-1">Manage all movies</p>
         </div>
-        <button onClick={() => { resetForm(); setShowForm(true); }} className="btn-gold text-sm px-5 py-2.5 flex items-center gap-2 w-fit">
+        <button onClick={() => { resetForm(); setShowForm(true); }} className="btn-teal text-sm px-5 py-2.5 flex items-center gap-2 w-fit">
           <Plus className="w-4 h-4" /> Add Movie
         </button>
       </div>
@@ -126,8 +126,8 @@ export default function AdminMoviesPage() {
                 <div><label className="text-xs text-slate-400 mb-1 block">Backdrop URL</label><input value={form.backdropUrl} onChange={(e) => setForm({ ...form, backdropUrl: e.target.value })} className="input-cinema" /></div>
               </div>
               <div className="flex gap-3 pt-4">
-                <button type="submit" className="btn-gold flex-1">{editing ? "Update Movie" : "Create Movie"}</button>
-                <button type="button" onClick={() => { setShowForm(false); resetForm(); }} className="btn-outline-gold flex-1">Cancel</button>
+                <button type="submit" className="btn-teal flex-1">{editing ? "Update Movie" : "Create Movie"}</button>
+                <button type="button" onClick={() => { setShowForm(false); resetForm(); }} className="btn-outline-teal flex-1">Cancel</button>
               </div>
             </form>
           </div>
@@ -174,7 +174,7 @@ export default function AdminMoviesPage() {
                   <td className="px-4 py-3"><span className="badge-rating text-[10px]">{movie.rating}</span></td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => startEdit(movie)} className="p-2 hover:bg-white/5 rounded-lg transition-colors"><Edit2 className="w-4 h-4 text-slate-400 hover:text-amber-400" /></button>
+                      <button onClick={() => startEdit(movie)} className="p-2 hover:bg-white/5 rounded-lg transition-colors"><Edit2 className="w-4 h-4 text-slate-400 hover:text-teal-400" /></button>
                       <button onClick={() => handleDelete(movie.id)} className="p-2 hover:bg-white/5 rounded-lg transition-colors"><Trash2 className="w-4 h-4 text-slate-400 hover:text-red-400" /></button>
                     </div>
                   </td>

@@ -41,13 +41,13 @@ function PaymentContent({ showId }: { showId: string }) {
     }
   }, [bookingId, user, router, showId]);
 
-  if (loading) return <div className="pt-24 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return <div className="pt-24 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" /></div>;
   if (!booking) {
     return (
       <div className="pt-24 text-center text-slate-400">
         <p className="text-5xl mb-4">⚠️</p>
         <p>Booking not found. Please start again.</p>
-        <button onClick={() => router.push("/movies")} className="btn-gold mt-4">Browse Movies</button>
+        <button onClick={() => router.push("/movies")} className="btn-teal mt-4">Browse Movies</button>
       </div>
     );
   }
@@ -94,7 +94,7 @@ function PaymentContent({ showId }: { showId: string }) {
           <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><CheckCircle className="w-8 h-8 text-green-400" /></div>
           <h3 className="text-xl font-bold text-white mb-2">Payment Successful!</h3>
           <p className="text-slate-400 text-sm mb-3">Your tickets have been confirmed.</p>
-          <p className="text-xs text-slate-500">Ref: <span className="text-amber-400 font-mono">{txRef}</span></p>
+          <p className="text-xs text-slate-500">Ref: <span className="text-teal-400 font-mono">{txRef}</span></p>
           <p className="text-xs text-slate-500 mt-2">Redirecting to your tickets...</p>
         </div>
       </div>
@@ -108,7 +108,7 @@ function PaymentContent({ showId }: { showId: string }) {
           <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><XCircle className="w-8 h-8 text-red-400" /></div>
           <h3 className="text-xl font-bold text-white mb-2">Payment Failed</h3>
           <p className="text-slate-400 text-sm mb-6">Your seats are still held. Please try again.</p>
-          <button onClick={() => setPayState("idle")} className="btn-gold w-full">Try Again</button>
+          <button onClick={() => setPayState("idle")} className="btn-teal w-full">Try Again</button>
         </div>
       </div>
     );
@@ -118,7 +118,7 @@ function PaymentContent({ showId }: { showId: string }) {
     <div className="pt-20 pb-16 min-h-screen max-w-4xl mx-auto px-4 sm:px-6">
       <button onClick={() => router.back()} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6 text-sm"><ArrowLeft className="w-4 h-4" /> Back</button>
       <h1 className="text-2xl font-black text-white mb-2">Complete Payment</h1>
-      <div className="h-1 w-16 bg-gold-gradient rounded-full mb-8" />
+      <div className="h-1 w-16 bg-teal-gradient rounded-full mb-8" />
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         <div className="lg:col-span-3 space-y-5">
@@ -188,16 +188,16 @@ function PaymentContent({ showId }: { showId: string }) {
               <div><p className="text-slate-400 text-xs">Cinema</p><p className="text-white text-sm">{booking.cinemaName}</p></div>
               <div><p className="text-slate-400 text-xs">Seats</p><div className="flex flex-wrap gap-1 mt-1">
                 {(typeof booking.seats === "string" ? JSON.parse(booking.seats) : booking.seats).map((s: any) => (
-                  <span key={s.seatId} className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded font-mono">{s.seatId.split("-").slice(-1)[0]}</span>
+                  <span key={s.seatId} className="text-xs bg-teal-500/10 text-teal-400 border border-teal-500/30 px-2 py-0.5 rounded font-mono">{s.seatId.split("-").slice(-1)[0]}</span>
                 ))}
               </div></div>
             </div>
             <div className="border-t border-cinema-border pt-4">
               <div className="flex justify-between items-center mb-2"><span className="text-slate-400 text-sm">Subtotal</span><span className="text-slate-200">{formatCurrency(booking.totalAmount)}</span></div>
               <div className="flex justify-between items-center mb-2"><span className="text-slate-400 text-sm">Booking fee</span><span className="text-slate-200">KES 0</span></div>
-              <div className="flex justify-between items-center border-t border-cinema-border pt-3 mt-3"><span className="text-white font-bold">Total</span><span className="text-2xl font-black text-amber-400">{formatCurrency(booking.totalAmount)}</span></div>
+              <div className="flex justify-between items-center border-t border-cinema-border pt-3 mt-3"><span className="text-white font-bold">Total</span><span className="text-2xl font-black text-teal-400">{formatCurrency(booking.totalAmount)}</span></div>
             </div>
-            <button onClick={handlePay} className="btn-gold w-full mt-5 py-4 flex items-center justify-center gap-2">Pay {formatCurrency(booking.totalAmount)}</button>
+            <button onClick={handlePay} className="btn-teal w-full mt-5 py-4 flex items-center justify-center gap-2">Pay {formatCurrency(booking.totalAmount)}</button>
           </div>
         </div>
       </div>

@@ -49,11 +49,11 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 bg-gold-gradient rounded-xl flex items-center justify-center shadow-gold group-hover:shadow-gold-lg transition-shadow">
+            <div className="w-9 h-9 bg-teal-gradient rounded-xl flex items-center justify-center shadow-teal group-hover:shadow-teal-lg transition-shadow">
               <Film className="w-5 h-5 text-black" />
             </div>
             <span className="font-bold text-lg">
-              <span className="text-gradient-gold">Cinema</span>
+              <span className="text-gradient-teal">Cinema</span>
               <span className="text-white">KE</span>
             </span>
           </Link>
@@ -66,7 +66,7 @@ export default function Header() {
                 href={link.href}
                 className={cn(
                   "btn-ghost text-sm",
-                  pathname === link.href && "text-amber-400 bg-amber-500/10"
+                  pathname === link.href && "text-teal-400 bg-teal-500/10"
                 )}
               >
                 {link.label}
@@ -82,8 +82,8 @@ export default function Header() {
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors"
                 >
-                  <div className="w-8 h-8 bg-amber-500/20 border border-amber-500/40 rounded-full flex items-center justify-center">
-                    <span className="text-amber-400 text-sm font-bold">
+                  <div className="w-8 h-8 bg-teal-500/20 border border-teal-500/40 rounded-full flex items-center justify-center">
+                    <span className="text-teal-400 text-sm font-bold">
                       {user.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -101,21 +101,21 @@ export default function Header() {
                         href={user.role === "admin" ? "/admin" : "/dashboard"}
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
                       >
-                        <ShieldCheck className="w-4 h-4 text-amber-400" />
+                        <ShieldCheck className="w-4 h-4 text-teal-400" />
                         {user.role === "admin" ? "Admin Dashboard" : "My Dashboard"}
                       </Link>
                       <Link
                         href="/dashboard"
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
                       >
-                        <Ticket className="w-4 h-4 text-amber-400" />
+                        <Ticket className="w-4 h-4 text-teal-400" />
                         My Bookings
                       </Link>
                       <Link
                         href="/profile"
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
                       >
-                        <User className="w-4 h-4 text-amber-400" />
+                        <User className="w-4 h-4 text-teal-400" />
                         Profile
                       </Link>
                     </div>
@@ -136,7 +136,7 @@ export default function Header() {
                 <Link href="/login" className="btn-ghost text-sm">
                   Sign In
                 </Link>
-                <Link href="/register" className="btn-gold text-sm px-5 py-2.5">
+                <Link href="/register" className="btn-teal text-sm px-5 py-2.5">
                   Get Started
                 </Link>
               </>
@@ -164,7 +164,7 @@ export default function Header() {
                 className={cn(
                   "block px-4 py-3 rounded-xl text-sm font-medium transition-colors",
                   pathname === link.href
-                    ? "bg-amber-500/10 text-amber-400"
+                    ? "bg-teal-500/10 text-teal-400"
                     : "text-slate-300 hover:bg-white/5 hover:text-white"
                 )}
               >
@@ -174,7 +174,7 @@ export default function Header() {
             <div className="pt-3 border-t border-cinema-border flex flex-col gap-2">
               {user ? (
                 <>
-                  <Link href={user.role === "admin" ? "/admin" : "/dashboard"} className="btn-outline-gold text-sm text-center">
+                  <Link href={user.role === "admin" ? "/admin" : "/dashboard"} className="btn-outline-teal text-sm text-center">
                     {user.role === "admin" ? "Admin Dashboard" : "My Dashboard"}
                   </Link>
                   <button onClick={handleLogout} className="text-red-400 text-sm py-2">
@@ -183,10 +183,10 @@ export default function Header() {
                 </>
               ) : (
                 <>
-                  <Link href="/login" className="btn-outline-gold text-sm text-center">
+                  <Link href="/login" className="btn-outline-teal text-sm text-center">
                     Sign In
                   </Link>
-                  <Link href="/register" className="btn-gold text-sm text-center">
+                  <Link href="/register" className="btn-teal text-sm text-center">
                     Get Started
                   </Link>
                 </>

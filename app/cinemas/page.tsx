@@ -16,16 +16,16 @@ export default function CinemasPage() {
         <p className="text-slate-400 max-w-xl mx-auto">
           Experience world-class entertainment across our state-of-the-art cinema locations in Kenya.
         </p>
-        <div className="h-1 w-16 bg-gold-gradient rounded-full mx-auto mt-4" />
+        <div className="h-1 w-16 bg-teal-gradient rounded-full mx-auto mt-4" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {cinemas.map((cinema: any) => (
-          <div key={cinema.id} className="card-cinema overflow-hidden group hover:border-amber-500/30 transition-colors">
+          <div key={cinema.id} className="card-cinema overflow-hidden group hover:border-teal-500/30 transition-colors">
             <div className="h-40 bg-cinema-bg relative overflow-hidden flex items-center justify-center">
               <div className="absolute inset-0 opacity-10"
-                  style={{ backgroundImage: "linear-gradient(#f5a623 1px, transparent 1px), linear-gradient(90deg, #f5a623 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
-              <MapPin className="w-10 h-10 text-amber-500/30 group-hover:scale-110 transition-transform duration-500" />
+                  style={{ backgroundImage: "linear-gradient(#2dd4bf 1px, transparent 1px), linear-gradient(90deg, #2dd4bf 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+              <MapPin className="w-10 h-10 text-teal-500/30 group-hover:scale-110 transition-transform duration-500" />
             </div>
             <div className="p-6">
               <h2 className="text-xl font-bold text-white mb-2">{cinema.name}</h2>
@@ -34,7 +34,7 @@ export default function CinemasPage() {
                 {cinema.location}
               </div>
               <div className="flex items-center gap-2 text-sm text-slate-400">
-                <Presentation className="w-4 h-4 text-amber-400" />
+                <Presentation className="w-4 h-4 text-teal-400" />
                 <span>{cinema.screenCount} Screen{cinema.screenCount !== 1 ? "s" : ""}</span>
               </div>
             </div>

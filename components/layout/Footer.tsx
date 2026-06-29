@@ -11,11 +11,11 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-1 lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 bg-gold-gradient rounded-xl flex items-center justify-center">
+              <div className="w-9 h-9 bg-teal-gradient rounded-xl flex items-center justify-center">
                 <Film className="w-5 h-5 text-black" />
               </div>
               <span className="font-bold text-lg">
-                <span className="text-gradient-gold">Cinema</span>
+                <span className="text-gradient-teal">Cinema</span>
                 <span className="text-white">KE</span>
               </span>
             </Link>
@@ -26,7 +26,7 @@ export default function Footer() {
               {[Facebook, Twitter, Instagram, Youtube].map((Icon, i) => (
                 <button
                   key={i}
-                  className="w-9 h-9 rounded-lg bg-cinema-card border border-cinema-border flex items-center justify-center hover:border-amber-500/50 hover:text-amber-400 transition-colors"
+                  className="w-9 h-9 rounded-lg bg-cinema-card border border-cinema-border flex items-center justify-center hover:border-teal-500/50 hover:text-teal-400 transition-colors"
                 >
                   <Icon className="w-4 h-4" />
                 </button>
@@ -48,7 +48,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-slate-400 text-sm hover:text-amber-400 transition-colors"
+                    className="text-slate-400 text-sm hover:text-teal-400 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -71,7 +71,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-slate-400 text-sm hover:text-amber-400 transition-colors"
+                    className="text-slate-400 text-sm hover:text-teal-400 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -85,15 +85,15 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4">Contact</h4>
             <ul className="space-y-3">
               <li className="flex items-start gap-3 text-slate-400 text-sm">
-                <MapPin className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
+                <MapPin className="w-4 h-4 text-teal-400 mt-0.5 shrink-0" />
                 Nairobi, Kenya
               </li>
               <li className="flex items-center gap-3 text-slate-400 text-sm">
-                <Phone className="w-4 h-4 text-amber-400 shrink-0" />
+                <Phone className="w-4 h-4 text-teal-400 shrink-0" />
                 +254 700 000 000
               </li>
               <li className="flex items-center gap-3 text-slate-400 text-sm">
-                <Mail className="w-4 h-4 text-amber-400 shrink-0" />
+                <Mail className="w-4 h-4 text-teal-400 shrink-0" />
                 info@cinemake.co.ke
               </li>
             </ul>

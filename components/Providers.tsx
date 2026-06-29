@@ -21,7 +21,7 @@ export default function Providers({ children }: { children: ReactNode }) {
                 border: "1px solid #1e2d45",
                 fontFamily: "Inter, sans-serif",
               },
-              success: { iconTheme: { primary: "#f5a623", secondary: "#080c14" } },
+              success: { iconTheme: { primary: "#2dd4bf", secondary: "#080c14" } },
               error: { iconTheme: { primary: "#e53e3e", secondary: "#fff" } },
             }}
           />

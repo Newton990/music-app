@@ -29,8 +29,8 @@ export default function MovieCard({ movie, comingSoon = false }: Props) {
     <Link
       href={`/movies/${movie.id}`}
       className={cn(
-        "group block card-cinema rounded-xl overflow-hidden hover:border-amber-500/40",
-        "hover:shadow-[0_8px_30px_rgba(245,166,35,0.15)] transition-all duration-300 hover:-translate-y-1"
+        "group block card-cinema rounded-xl overflow-hidden hover:border-teal-500/40",
+        "hover:shadow-[0_8px_30px_rgba(45,212,191,0.15)] transition-all duration-300 hover:-translate-y-1"
       )}
     >
       {/* Poster */}
@@ -48,13 +48,13 @@ export default function MovieCard({ movie, comingSoon = false }: Props) {
 
         {/* Rating */}
         <div className="absolute top-2 left-2 flex items-center gap-1 bg-black/60 rounded-md px-2 py-0.5 backdrop-blur-sm">
-          <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+          <Star className="w-3 h-3 text-teal-400 fill-teal-400" />
           <span className="text-white text-xs font-bold">{movie.imdbRating}</span>
         </div>
 
         {/* Coming soon badge */}
         {comingSoon && (
-          <div className="absolute top-2 right-2 px-2 py-0.5 bg-amber-500 text-black text-[10px] font-bold rounded-md">
+          <div className="absolute top-2 right-2 px-2 py-0.5 bg-teal-500 text-black text-[10px] font-bold rounded-md">
             SOON
           </div>
         )}
@@ -63,7 +63,7 @@ export default function MovieCard({ movie, comingSoon = false }: Props) {
         <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="flex flex-wrap gap-1 mb-1">
             {movie.genre.slice(0, 2).map((g) => (
-              <span key={g} className="text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded-full font-medium">
+              <span key={g} className="text-[9px] bg-teal-500/20 text-teal-400 border border-teal-500/30 px-1.5 py-0.5 rounded-full font-medium">
                 {g}
               </span>
             ))}
@@ -73,7 +73,7 @@ export default function MovieCard({ movie, comingSoon = false }: Props) {
 
       {/* Info */}
       <div className="p-3">
-        <h3 className="text-sm font-bold text-white line-clamp-1 group-hover:text-amber-300 transition-colors mb-1">
+        <h3 className="text-sm font-bold text-white line-clamp-1 group-hover:text-teal-300 transition-colors mb-1">
           {movie.title}
         </h3>
         <div className="flex items-center justify-between text-xs text-slate-400">
@@ -82,7 +82,7 @@ export default function MovieCard({ movie, comingSoon = false }: Props) {
             {formatDuration(movie.duration)}
           </span>
           {comingSoon ? (
-            <span className="flex items-center gap-1 text-amber-400">
+            <span className="flex items-center gap-1 text-teal-400">
               <Calendar className="w-3 h-3" />
               {new Date(movie.releaseDate).toLocaleDateString("en-KE", { month: "short", day: "numeric" })}
             </span>

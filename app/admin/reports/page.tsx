@@ -27,7 +27,7 @@ export default function AdminReportsPage() {
         <div>
           <h1 className="text-3xl font-black text-white mb-2">Sales Reports</h1>
           <p className="text-slate-400">Platform performance and analytics</p>
-          <div className="h-1 w-16 bg-gold-gradient rounded-full mt-3" />
+          <div className="h-1 w-16 bg-teal-gradient rounded-full mt-3" />
         </div>
       </div>
 
@@ -61,7 +61,7 @@ export default function AdminReportsPage() {
           </div>
           <p className="text-3xl font-black text-purple-400">{data.totalShows}</p>
           <div className="flex gap-4 mt-1 text-xs">
-            <span className="text-amber-400">{data.upcomingShows} upcoming</span>
+            <span className="text-teal-400">{data.upcomingShows} upcoming</span>
             <span className="text-slate-400">{data.todayShows} today</span>
           </div>
         </div>
@@ -70,7 +70,7 @@ export default function AdminReportsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
         <div className="card-cinema p-6">
           <div className="flex items-center gap-3 mb-6">
-            <TrendingUp className="w-5 h-5 text-amber-400" />
+            <TrendingUp className="w-5 h-5 text-teal-400" />
             <h3 className="font-bold text-white">Popular Movies</h3>
           </div>
           {data.popularMovies.length === 0 ? (
@@ -88,7 +88,7 @@ export default function AdminReportsPage() {
                     </div>
                   </div>
                   <div className="w-32 h-2 bg-cinema-bg rounded-full overflow-hidden">
-                    <div className="h-full bg-gold-gradient rounded-full" style={{ width: `${Math.min(100, (m.bookingCount / Math.max(...data.popularMovies.map((x: any) => x.bookingCount))) * 100)}%` }} />
+                    <div className="h-full bg-teal-gradient rounded-full" style={{ width: `${Math.min(100, (m.bookingCount / Math.max(...data.popularMovies.map((x: any) => x.bookingCount))) * 100)}%` }} />
                   </div>
                 </div>
               ))}
@@ -98,7 +98,7 @@ export default function AdminReportsPage() {
 
         <div className="card-cinema p-6">
           <div className="flex items-center gap-3 mb-6">
-            <BarChart3 className="w-5 h-5 text-amber-400" />
+            <BarChart3 className="w-5 h-5 text-teal-400" />
             <h3 className="font-bold text-white">Booking Breakdown</h3>
           </div>
           <div className="space-y-4">
@@ -118,7 +118,7 @@ export default function AdminReportsPage() {
 
           <div className="mt-8">
             <h4 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-              <Film className="w-4 h-4 text-amber-400" />
+              <Film className="w-4 h-4 text-teal-400" />
               Monthly Revenue
             </h4>
             {data.monthlyRevenue.length === 0 ? (
@@ -129,9 +129,9 @@ export default function AdminReportsPage() {
                   <div key={m.month} className="flex items-center gap-3">
                     <span className="text-xs text-slate-400 w-16">{m.month}</span>
                     <div className="flex-1 h-4 bg-cinema-bg rounded-full overflow-hidden">
-                      <div className="h-full bg-amber-500 rounded-full" style={{ width: `${Math.min(100, (m.revenue / Math.max(...data.monthlyRevenue.map((x: any) => x.revenue))) * 100)}%` }} />
+                      <div className="h-full bg-teal-500 rounded-full" style={{ width: `${Math.min(100, (m.revenue / Math.max(...data.monthlyRevenue.map((x: any) => x.revenue))) * 100)}%` }} />
                     </div>
-                    <span className="text-xs text-amber-400 font-semibold w-24 text-right">{formatCurrency(m.revenue)}</span>
+                    <span className="text-xs text-teal-400 font-semibold w-24 text-right">{formatCurrency(m.revenue)}</span>
                   </div>
                 ))}
               </div>

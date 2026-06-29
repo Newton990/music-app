@@ -22,7 +22,7 @@ export default function AdminDashboard() {
         <div>
           <h1 className="text-3xl font-black text-white mb-2">Admin Dashboard</h1>
           <p className="text-slate-400">Manage your cinema platform</p>
-          <div className="h-1 w-16 bg-gold-gradient rounded-full mt-3" />
+          <div className="h-1 w-16 bg-teal-gradient rounded-full mt-3" />
         </div>
       </div>
 
@@ -30,13 +30,13 @@ export default function AdminDashboard() {
         <StatCard icon={Film} label="Total Movies" value={stats?.totalMovies ?? 0} color="text-blue-400" bg="bg-blue-500/10" />
         <StatCard icon={Clapperboard} label="Total Shows" value={stats?.totalShows ?? 0} color="text-purple-400" bg="bg-purple-500/10" />
         <StatCard icon={Ticket} label="Total Bookings" value={stats?.totalBookings ?? 0} color="text-green-400" bg="bg-green-500/10" />
-        <StatCard icon={DollarSign} label="Total Revenue" value={formatCurrency(stats?.totalRevenue ?? 0)} color="text-amber-400" bg="bg-amber-500/10" />
+        <StatCard icon={DollarSign} label="Total Revenue" value={formatCurrency(stats?.totalRevenue ?? 0)} color="text-teal-400" bg="bg-teal-500/10" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="card-cinema p-6">
           <div className="flex items-center gap-3 mb-4">
-            <TrendingUp className="w-5 h-5 text-amber-400" />
+            <TrendingUp className="w-5 h-5 text-teal-400" />
             <h3 className="font-bold text-white">Booking Stats</h3>
           </div>
           <div className="space-y-3">
@@ -48,22 +48,22 @@ export default function AdminDashboard() {
 
         <div className="card-cinema p-6">
           <div className="flex items-center gap-3 mb-4">
-            <DollarSign className="w-5 h-5 text-amber-400" />
+            <DollarSign className="w-5 h-5 text-teal-400" />
             <h3 className="font-bold text-white">Revenue</h3>
           </div>
-          <p className="text-3xl font-black text-amber-400">{formatCurrency(stats?.totalRevenue ?? 0)}</p>
+          <p className="text-3xl font-black text-teal-400">{formatCurrency(stats?.totalRevenue ?? 0)}</p>
           <p className="text-xs text-slate-500 mt-1">Total confirmed revenue</p>
         </div>
 
         <div className="card-cinema p-6">
           <div className="flex items-center gap-3 mb-4">
-            <AlertCircle className="w-5 h-5 text-amber-400" />
+            <AlertCircle className="w-5 h-5 text-teal-400" />
             <h3 className="font-bold text-white">Quick Actions</h3>
           </div>
           <div className="space-y-2">
-            <a href="/admin/movies" className="block w-full text-center btn-outline-gold text-sm py-2">Manage Movies</a>
-            <a href="/admin/shows" className="block w-full text-center btn-outline-gold text-sm py-2">Manage Shows</a>
-            <a href="/admin/bookings" className="block w-full text-center btn-outline-gold text-sm py-2">View Bookings</a>
+            <a href="/admin/movies" className="block w-full text-center btn-outline-teal text-sm py-2">Manage Movies</a>
+            <a href="/admin/shows" className="block w-full text-center btn-outline-teal text-sm py-2">Manage Shows</a>
+            <a href="/admin/bookings" className="block w-full text-center btn-outline-teal text-sm py-2">View Bookings</a>
           </div>
         </div>
       </div>

@@ -38,7 +38,7 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
     }
   }, [movie, selectedDate]);
 
-  if (loading) return <div className="pt-16 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return <div className="pt-16 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" /></div>;
   if (!movie) return notFound();
 
   const shows = movie.shows || [];
@@ -73,7 +73,7 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
 
           <div className="flex flex-wrap items-center gap-4 text-sm text-slate-300">
             <span className="flex items-center gap-1.5">
-              <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+              <Star className="w-4 h-4 text-teal-400 fill-teal-400" />
               <span className="font-bold text-white">{movie.imdbRating}</span>/10
             </span>
             <span className="flex items-center gap-1.5">
@@ -106,7 +106,7 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
               <div className="mb-3">
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Director</p>
                 <p className="text-slate-200 font-medium flex items-center gap-2">
-                  <User className="w-4 h-4 text-amber-400" />
+                  <User className="w-4 h-4 text-teal-400" />
                   {movie.director}
                 </p>
               </div>
@@ -138,7 +138,7 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
             ) : (
               <div className="card-cinema p-5">
                 <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <Ticket className="w-5 h-5 text-amber-400" />
+                  <Ticket className="w-5 h-5 text-teal-400" />
                   Book Tickets
                 </h2>
 
@@ -151,7 +151,7 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
                         onClick={() => setSelectedDate(d)}
                         className={`flex flex-col items-center px-3 py-2 rounded-xl border transition-all ${
                           selectedDate === d
-                            ? "border-amber-500 bg-amber-500/10 text-amber-400"
+                            ? "border-teal-500 bg-teal-500/10 text-teal-400"
                             : "border-cinema-border text-slate-400 hover:border-slate-500"
                         }`}
                       >
@@ -172,20 +172,20 @@ export default function MovieDetailPage({ params }: { params: { id: string } }) 
                     <Link
                       key={show.id}
                       href={`/booking/${show.id}/seats`}
-                      className="block p-4 rounded-xl border border-cinema-border hover:border-amber-500/50 hover:bg-amber-500/5 transition-all group"
+                      className="block p-4 rounded-xl border border-cinema-border hover:border-teal-500/50 hover:bg-teal-500/5 transition-all group"
                     >
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-bold text-white text-lg">
                           {formatTime(show.startTime)}
                         </span>
-                        <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-amber-400 transition-colors" />
+                        <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-teal-400 transition-colors" />
                       </div>
                       <div className="text-xs text-slate-400">
                         <p>{show.cinemaName}</p>
                         <p>{show.screenName}</p>
                       </div>
                       <div className="flex flex-wrap gap-2 mt-2">
-                        <span className="text-xs text-slate-300">Standard: <span className="text-amber-400 font-semibold">{formatCurrency(show.price)}</span></span>
+                        <span className="text-xs text-slate-300">Standard: <span className="text-teal-400 font-semibold">{formatCurrency(show.price)}</span></span>
                         <span className="text-xs text-blue-300">VIP: <span className="text-blue-400 font-semibold">{formatCurrency(show.vipPrice)}</span></span>
                         <span className="text-xs text-purple-300">Premium: <span className="text-purple-400 font-semibold">{formatCurrency(show.premiumPrice)}</span></span>
                       </div>

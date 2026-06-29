@@ -51,7 +51,7 @@ export default function AdminScreensPage() {
           <h1 className="text-2xl font-black text-white">Screens</h1>
           <p className="text-slate-400 text-sm mt-1">Manage cinema screens</p>
         </div>
-        <button onClick={() => setShowForm(true)} className="btn-gold text-sm px-5 py-2.5 flex items-center gap-2 w-fit">
+        <button onClick={() => setShowForm(true)} className="btn-teal text-sm px-5 py-2.5 flex items-center gap-2 w-fit">
           <Plus className="w-4 h-4" /> Add Screen
         </button>
       </div>
@@ -76,8 +76,8 @@ export default function AdminScreensPage() {
                 <div><label className="text-xs text-slate-400 mb-1 block">Cols *</label><input required type="number" min="1" value={form.cols} onChange={(e) => setForm({ ...form, cols: e.target.value })} className="input-cinema" /></div>
               </div>
               <div className="flex gap-3 pt-4">
-                <button type="submit" className="btn-gold flex-1">Create Screen</button>
-                <button type="button" onClick={() => setShowForm(false)} className="btn-outline-gold flex-1">Cancel</button>
+                <button type="submit" className="btn-teal flex-1">Create Screen</button>
+                <button type="button" onClick={() => setShowForm(false)} className="btn-outline-teal flex-1">Cancel</button>
               </div>
             </form>
           </div>
@@ -97,9 +97,9 @@ export default function AdminScreensPage() {
               </div>
             </div>
             <div className="flex items-center gap-4 text-sm text-slate-300">
-              <span><span className="text-amber-400 font-semibold">{screen.rows}</span> rows</span>
-              <span><span className="text-amber-400 font-semibold">{screen.cols}</span> cols</span>
-              <span><span className="text-amber-400 font-semibold">{Number(screen.rows) * Number(screen.cols)}</span> seats</span>
+              <span><span className="text-teal-400 font-semibold">{screen.rows}</span> rows</span>
+              <span><span className="text-teal-400 font-semibold">{screen.cols}</span> cols</span>
+              <span><span className="text-teal-400 font-semibold">{Number(screen.rows) * Number(screen.cols)}</span> seats</span>
             </div>
           </div>
         ))}

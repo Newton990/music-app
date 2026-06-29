@@ -30,7 +30,7 @@ export default function HomePage() {
     return () => clearInterval(id);
   }, [autoplay, heroMovies.length]);
 
-  if (loading) return <div className="pt-16 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return <div className="pt-16 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" /></div>;
 
   const heroMovie = heroMovies[heroIndex] || heroMovies[0];
   if (!heroMovie) return <div className="pt-16 min-h-screen" />;
@@ -51,7 +51,7 @@ export default function HomePage() {
         {/* Mesh bg */}
         <div className="absolute inset-0 bg-cinema-bg" />
         <div className="absolute inset-0 opacity-10"
-          style={{ backgroundImage: "radial-gradient(circle at 30% 40%, #f5a623 0%, transparent 50%), radial-gradient(circle at 70% 60%, #3b82f6 0%, transparent 50%)" }} />
+          style={{ backgroundImage: "radial-gradient(circle at 30% 40%, #2dd4bf 0%, transparent 50%), radial-gradient(circle at 70% 60%, #3b82f6 0%, transparent 50%)" }} />
 
         {/* Content */}
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 w-full">
@@ -73,7 +73,7 @@ export default function HomePage() {
               {/* Meta */}
               <div className="flex items-center gap-4 text-sm text-slate-300 mb-5">
                 <div className="flex items-center gap-1.5">
-                  <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                  <Star className="w-4 h-4 text-teal-400 fill-teal-400" />
                   <span className="font-bold text-white">{heroMovie.imdbRating}</span>
                   <span className="text-slate-400">/10 IMDB</span>
                 </div>
@@ -92,14 +92,14 @@ export default function HomePage() {
               <div className="flex flex-wrap gap-3">
                 <Link
                   href={`/movies/${heroMovie.id}`}
-                  className="btn-gold flex items-center gap-2"
+                  className="btn-teal flex items-center gap-2"
                 >
                   <Ticket className="w-4 h-4" />
                   Book Tickets
                 </Link>
                 <Link
                   href={`/movies/${heroMovie.id}`}
-                  className="btn-outline-gold flex items-center gap-2"
+                  className="btn-outline-teal flex items-center gap-2"
                 >
                   <Play className="w-4 h-4" />
                   More Info
@@ -113,7 +113,7 @@ export default function HomePage() {
                     <Link
                       key={show.id}
                       href={`/booking/${show.id}/seats`}
-                      className="px-3 py-1.5 text-xs font-medium bg-white/10 hover:bg-amber-500/20 border border-white/20 hover:border-amber-500/40 rounded-lg text-white transition-colors"
+                      className="px-3 py-1.5 text-xs font-medium bg-white/10 hover:bg-teal-500/20 border border-white/20 hover:border-teal-500/40 rounded-lg text-white transition-colors"
                     >
                       {formatTime(show.startTime)}
                     </Link>
@@ -130,7 +130,7 @@ export default function HomePage() {
                   onClick={() => { setHeroIndex(i); setAutoplay(false); }}
                   className={`relative overflow-hidden rounded-xl transition-all duration-300 flex-shrink-0 ${
                     i === heroIndex
-                      ? "ring-2 ring-amber-500 shadow-gold scale-105"
+                      ? "ring-2 ring-teal-500 shadow-teal scale-105"
                       : "opacity-50 hover:opacity-80"
                   }`}
                   style={{ width: 90, height: 60 }}
@@ -152,7 +152,7 @@ export default function HomePage() {
                 key={i}
                 onClick={() => { setHeroIndex(i); setAutoplay(false); }}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === heroIndex ? "w-8 bg-amber-500" : "w-2 bg-white/30"
+                  i === heroIndex ? "w-8 bg-teal-500" : "w-2 bg-white/30"
                 }`}
               />
             ))}
@@ -162,13 +162,13 @@ export default function HomePage() {
         {/* Prev/Next arrows */}
         <button
           onClick={() => { setHeroIndex((i) => (i - 1 + heroMovies.length) % heroMovies.length); setAutoplay(false); }}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/50 hover:bg-amber-500/20 border border-white/20 hover:border-amber-500/50 flex items-center justify-center transition-colors"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/50 hover:bg-teal-500/20 border border-white/20 hover:border-teal-500/50 flex items-center justify-center transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
         <button
           onClick={() => { setHeroIndex((i) => (i + 1) % heroMovies.length); setAutoplay(false); }}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/50 hover:bg-amber-500/20 border border-white/20 hover:border-amber-500/50 flex items-center justify-center transition-colors"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/50 hover:bg-teal-500/20 border border-white/20 hover:border-teal-500/50 flex items-center justify-center transition-colors"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
@@ -179,9 +179,9 @@ export default function HomePage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="section-title">Now Showing</h2>
-            <div className="h-1 w-16 bg-gold-gradient rounded-full mt-2" />
+            <div className="h-1 w-16 bg-teal-gradient rounded-full mt-2" />
           </div>
-          <Link href="/movies" className="flex items-center gap-1 text-amber-400 hover:text-amber-300 text-sm font-medium transition-colors">
+          <Link href="/movies" className="flex items-center gap-1 text-teal-400 hover:text-teal-300 text-sm font-medium transition-colors">
             View All <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -200,7 +200,7 @@ export default function HomePage() {
             <p className="text-slate-400 max-w-xl mx-auto">
               Book your favourite movie in three simple steps
             </p>
-            <div className="h-1 w-16 bg-gold-gradient rounded-full mt-3 mx-auto" />
+            <div className="h-1 w-16 bg-teal-gradient rounded-full mt-3 mx-auto" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
@@ -223,12 +223,12 @@ export default function HomePage() {
                 desc: "Pay instantly via M-Pesa, Visa card, or digital wallet. Get your e-ticket via SMS and email.",
               },
             ].map((item, i) => (
-              <div key={i} className="card-cinema p-8 relative text-center group hover:border-amber-500/30 transition-colors">
-                <div className="text-6xl font-black text-amber-500/10 group-hover:text-amber-500/20 transition-colors absolute top-4 right-6 select-none">
+              <div key={i} className="card-cinema p-8 relative text-center group hover:border-teal-500/30 transition-colors">
+                <div className="text-6xl font-black text-teal-500/10 group-hover:text-teal-500/20 transition-colors absolute top-4 right-6 select-none">
                   {item.step}
                 </div>
-                <div className="w-14 h-14 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:shadow-gold transition-shadow">
-                  <item.icon className="w-6 h-6 text-amber-400" />
+                <div className="w-14 h-14 bg-teal-500/10 border border-teal-500/30 rounded-2xl flex items-center justify-center mx-auto mb-5 group-hover:shadow-teal transition-shadow">
+                  <item.icon className="w-6 h-6 text-teal-400" />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-3">{item.title}</h3>
                 <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
@@ -243,9 +243,9 @@ export default function HomePage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="section-title">Coming Soon</h2>
-            <div className="h-1 w-16 bg-gold-gradient rounded-full mt-2" />
+            <div className="h-1 w-16 bg-teal-gradient rounded-full mt-2" />
           </div>
-          <Link href="/movies?status=coming_soon" className="flex items-center gap-1 text-amber-400 hover:text-amber-300 text-sm font-medium transition-colors">
+          <Link href="/movies?status=coming_soon" className="flex items-center gap-1 text-teal-400 hover:text-teal-300 text-sm font-medium transition-colors">
             View All <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -259,11 +259,11 @@ export default function HomePage() {
       {/* ─── CTA BANNER ────────────────────────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="relative overflow-hidden card-cinema rounded-3xl p-10 md:p-14">
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-transparent pointer-events-none" />
-          <div className="absolute -right-20 -top-20 w-80 h-80 bg-amber-500/5 rounded-full blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-transparent pointer-events-none" />
+          <div className="absolute -right-20 -top-20 w-80 h-80 bg-teal-500/5 rounded-full blur-3xl" />
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
             <div className="flex-1">
-              <p className="text-amber-400 font-semibold text-sm mb-2 uppercase tracking-wider">Start Today</p>
+              <p className="text-teal-400 font-semibold text-sm mb-2 uppercase tracking-wider">Start Today</p>
               <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
                 Never Wait in Line Again
               </h2>
@@ -272,11 +272,11 @@ export default function HomePage() {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 shrink-0">
-              <Link href="/register" className="btn-gold flex items-center gap-2 whitespace-nowrap">
+              <Link href="/register" className="btn-teal flex items-center gap-2 whitespace-nowrap">
                 <Smartphone className="w-4 h-4" />
                 Get Started Free
               </Link>
-              <Link href="/movies" className="btn-outline-gold whitespace-nowrap">
+              <Link href="/movies" className="btn-outline-teal whitespace-nowrap">
                 Browse Movies
               </Link>
             </div>

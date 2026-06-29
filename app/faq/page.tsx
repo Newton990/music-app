@@ -15,14 +15,14 @@ export default function FAQPage() {
       <div className="text-center mb-12">
         <h1 className="text-3xl font-black text-white mb-2">Frequently Asked Questions</h1>
         <p className="text-slate-400">Everything you need to know about CinemaKE</p>
-        <div className="h-1 w-16 bg-gold-gradient rounded-full mx-auto mt-4" />
+        <div className="h-1 w-16 bg-teal-gradient rounded-full mx-auto mt-4" />
       </div>
       <div className="space-y-3">
         {faqs.map((item, i) => (
           <details key={i} className="group card-cinema [&_summary::-webkit-details-marker]:hidden">
             <summary className="flex items-center justify-between p-5 cursor-pointer select-none">
               <span className="text-white font-medium text-sm">{item.q}</span>
-              <ChevronDown className="w-4 h-4 text-amber-400 shrink-0 transition-transform group-open:rotate-180" />
+              <ChevronDown className="w-4 h-4 text-teal-400 shrink-0 transition-transform group-open:rotate-180" />
             </summary>
             <div className="px-5 pb-5 border-t border-cinema-border mt-3 pt-3">
               <p className="text-slate-400 text-sm leading-relaxed">{item.a}</p>
