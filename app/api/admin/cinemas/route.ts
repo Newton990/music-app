@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, location, imageUrl } = body;
+    const { name, location } = body;
 
     if (!name || !location) {
       return NextResponse.json({ error: "Name and location are required" }, { status: 400 });
@@ -40,11 +40,11 @@ export async function POST(req: NextRequest) {
 
     const id = `ci${Date.now()}`;
     await query(
-      "INSERT INTO Cinema (id, name, location, imageUrl) VALUES (?, ?, ?, ?)",
-      [id, name, location, imageUrl || ""]
+      "INSERT INTO Cinema (id, name, location) VALUES (?, ?, ?)",
+      [id, name, location]
     );
 
-    return NextResponse.json({ id, name, location, imageUrl: imageUrl || "" }, { status: 201 });
+    return NextResponse.json({ id, name, location }, { status: 201 });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

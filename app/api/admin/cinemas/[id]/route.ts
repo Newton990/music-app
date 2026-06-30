@@ -18,11 +18,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     }
 
     const body = await req.json();
-    const { name, location, imageUrl } = body;
+    const { name, location } = body;
 
     await query(
-      "UPDATE Cinema SET name=?, location=?, imageUrl=? WHERE id=?",
-      [name, location, imageUrl || "", params.id]
+      "UPDATE Cinema SET name=?, location=? WHERE id=?",
+      [name, location, params.id]
     );
 
     return NextResponse.json({ message: "Cinema updated" });
