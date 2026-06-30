@@ -5,12 +5,13 @@ import { useAuth } from "@/context/auth-context";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, Film, Clapperboard, Monitor, Ticket, BarChart3, Settings, ChevronLeft
+  LayoutDashboard, Film, Clapperboard, Monitor, Ticket, BarChart3, Settings, ChevronLeft, Building2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const sidebarLinks = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
+  { href: "/admin/cinemas", label: "Cinemas", icon: Building2 },
   { href: "/admin/movies", label: "Movies", icon: Film },
   { href: "/admin/shows", label: "Shows", icon: Clapperboard },
   { href: "/admin/screens", label: "Screens", icon: Monitor },

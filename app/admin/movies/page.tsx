@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Edit2, Trash2, Film, Search, X } from "lucide-react";
 import toast from "react-hot-toast";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 export default function AdminMoviesPage() {
   const [movies, setMovies] = useState<any[]>([]);
@@ -122,8 +123,8 @@ export default function AdminMoviesPage() {
                 <div><label className="text-xs text-slate-400 mb-1 block">Director</label><input value={form.director} onChange={(e) => setForm({ ...form, director: e.target.value })} className="input-cinema" /></div>
                 <div><label className="text-xs text-slate-400 mb-1 block">Cast (comma-separated)</label><input value={form.cast} onChange={(e) => setForm({ ...form, cast: e.target.value })} className="input-cinema" /></div>
                 <div className="md:col-span-2"><label className="text-xs text-slate-400 mb-1 block">Description</label><textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="input-cinema" /></div>
-                <div><label className="text-xs text-slate-400 mb-1 block">Poster URL</label><input value={form.posterUrl} onChange={(e) => setForm({ ...form, posterUrl: e.target.value })} className="input-cinema" /></div>
-                <div><label className="text-xs text-slate-400 mb-1 block">Backdrop URL</label><input value={form.backdropUrl} onChange={(e) => setForm({ ...form, backdropUrl: e.target.value })} className="input-cinema" /></div>
+                <ImageUpload label="Poster" value={form.posterUrl} onChange={(v) => setForm({ ...form, posterUrl: v })} />
+                <ImageUpload label="Backdrop" value={form.backdropUrl} onChange={(v) => setForm({ ...form, backdropUrl: v })} />
               </div>
               <div className="flex gap-3 pt-4">
                 <button type="submit" className="btn-teal flex-1">{editing ? "Update Movie" : "Create Movie"}</button>

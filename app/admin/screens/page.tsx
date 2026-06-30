@@ -32,7 +32,8 @@ export default function AdminScreensPage() {
     }
     try {
       const res = await fetch("/api/admin/screens", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, rows: Number(form.rows), cols: Number(form.cols) }) });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.error || "Failed to create screen"); return; }
       toast.success("Screen created");
       setShowForm(false);
       setForm({ cinemaId: "", name: "", rows: "", cols: "" });
