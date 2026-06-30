@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import { Suspense } from "react";
 
 type PaymentMethod = "mpesa" | "card" | "wallet";
-type PaymentState = "idle" | "processing" | "success" | "failed";
+type PaymentState = "idle" | "processing" | "pending" | "success" | "failed";
 
 function PaymentContent({ showId }: { showId: string }) {
   const router = useRouter();
@@ -24,6 +24,8 @@ function PaymentContent({ showId }: { showId: string }) {
   const [phone, setPhone] = useState("07");
   const [payState, setPayState] = useState<PaymentState>("idle");
   const [txRef, setTxRef] = useState("");
+  const [pollCount, setPollCount] = useState(0);
+  const POLL_LIMIT = 60; // 60 polls × 3s = 3 min timeout
 
   useEffect(() => {
     if (!user) {
@@ -48,14 +50,42 @@ function PaymentContent({ showId }: { showId: string }) {
     );
   }
 
+  useEffect(() => {
+    if (payState !== "pending") return;
+    if (pollCount >= POLL_LIMIT) {
+      setPayState("failed");
+      toast.error("Payment timed out. Your seats are still held.");
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/payments/status?bookingId=${bookingId}`);
+        const data = await res.json();
+        if (data.status === "success") {
+          setPayState("success");
+          setTxRef(data.transactionRef);
+          toast.success("Payment confirmed!");
+          setTimeout(() => router.push(`/booking/confirmation?bookingId=${bookingId}`), 2500);
+          return;
+        }
+        if (data.status === "failed") {
+          setPayState("failed");
+          toast.error("Payment failed.");
+          return;
+        }
+        setPollCount((c) => c + 1);
+      } catch { setPollCount((c) => c + 1); }
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [payState, pollCount, bookingId, router]);
+
   const handlePay = async () => {
     if (method === "mpesa" && phone.replace(/\s/g, "").length < 9) {
       toast.error("Enter a valid phone number"); return;
     }
 
-    setPayState("processing");
-
     if (method === "card") {
+      setPayState("processing");
       const res = await fetch("/api/payments/paystack/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -75,14 +105,15 @@ function PaymentContent({ showId }: { showId: string }) {
     const result = await processPayment(bookingId, method, phone);
     setTxRef(result.ref);
 
-    if (result.success) {
-      setPayState("success");
-      toast.success("Payment successful!");
-      setTimeout(() => router.push(`/booking/confirmation?bookingId=${bookingId}`), 2500);
-    } else {
+    if (!result.success) {
       setPayState("failed");
       toast.error("Payment failed. Please try again.");
+      return;
     }
+
+    // M-Pesa: start polling for confirmation
+    setPayState("pending");
+    setPollCount(0);
   };
 
   if (payState === "processing") {
@@ -92,6 +123,25 @@ function PaymentContent({ showId }: { showId: string }) {
           <div className="w-16 h-16 spinner mx-auto mb-6" />
           <h3 className="text-xl font-bold text-white mb-2">Processing Payment</h3>
           <p className="text-slate-400 text-sm">{method === "mpesa" ? "Check your phone for the M-Pesa prompt..." : "Verifying with your bank..."}</p>
+          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-500"><Shield className="w-3 h-3" />256-bit SSL encrypted</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (payState === "pending") {
+    const elapsed = Math.floor((pollCount * 3) / 60);
+    const remaining = Math.max(0, Math.ceil((POLL_LIMIT - pollCount) * 3 / 60));
+    return (
+      <div className="pt-24 min-h-screen flex items-center justify-center">
+        <div className="card-cinema p-10 text-center max-w-sm mx-auto animate-fade-in">
+          <div className="w-16 h-16 spinner mx-auto mb-6" />
+          <h3 className="text-xl font-bold text-white mb-2">Waiting for M-Pesa</h3>
+          <p className="text-slate-400 text-sm mb-2">Enter your M-Pesa PIN on your phone to confirm payment.</p>
+          <div className="w-full bg-cinema-bg rounded-full h-2 mt-4 mb-2">
+            <div className="bg-teal-500 h-2 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (pollCount / POLL_LIMIT) * 100)}%` }} />
+          </div>
+          <p className="text-xs text-slate-500">Waiting for confirmation{elapsed > 0 ? ` (${elapsed}m elapsed)` : ""}...</p>
           <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-500"><Shield className="w-3 h-3" />256-bit SSL encrypted</div>
         </div>
       </div>
