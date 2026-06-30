@@ -20,18 +20,20 @@ const sidebarLinks = [
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
+    if (isLoading) return;
     if (!user) {
       router.push("/login?redirect=/admin");
     } else if (user.role !== "admin") {
       router.push("/");
     }
-  }, [user, router]);
+  }, [user, router, isLoading]);
 
+  if (isLoading) return null;
   if (!user || user.role !== "admin") return null;
 
   return (

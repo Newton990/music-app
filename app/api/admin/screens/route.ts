@@ -40,12 +40,37 @@ export async function POST(req: NextRequest) {
     }
 
     const id = `sc${Date.now()}`;
+    const numRows = Number(rows);
+    const numCols = Number(cols);
     await query(
       "INSERT INTO Screen (id, cinemaId, name, rows, cols) VALUES (?, ?, ?, ?, ?)",
-      [id, cinemaId, name, Number(rows), Number(cols)]
+      [id, cinemaId, name, numRows, numCols]
     );
 
-    return NextResponse.json({ id, cinemaId, name, rows: Number(rows), cols: Number(cols) }, { status: 201 });
+    // Generate seats for the screen
+    const seatValues: string[] = [];
+    const seatParams: any[] = [];
+    const rowLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for (let r = 0; r < numRows; r++) {
+      const rowLabel = rowLetters[r] || `R${r + 1}`;
+      // Last 2 rows are VIP, first 2 rows premium, rest standard
+      let seatType = "standard";
+      if (numRows - r <= 2) seatType = "vip";
+      else if (r < 2) seatType = "premium";
+
+      for (let c = 1; c <= numCols; c++) {
+        seatValues.push("(?,?,?,?,?)");
+        seatParams.push(`st${id}-${rowLabel}${c}`, id, rowLabel, c, seatType);
+      }
+    }
+    if (seatValues.length > 0) {
+      await query(
+        `INSERT INTO Seat (id, screenId, \`row\`, col, type) VALUES ${seatValues.join(",")}`,
+        seatParams
+      );
+    }
+
+    return NextResponse.json({ id, cinemaId, name, rows: numRows, cols: numCols, seatsGenerated: seatValues.length }, { status: 201 });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }

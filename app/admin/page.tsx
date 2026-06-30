@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Film, Clapperboard, Ticket, DollarSign, TrendingUp, AlertCircle } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
@@ -61,9 +62,9 @@ export default function AdminDashboard() {
             <h3 className="font-bold text-white">Quick Actions</h3>
           </div>
           <div className="space-y-2">
-            <a href="/admin/movies" className="block w-full text-center btn-outline-teal text-sm py-2">Manage Movies</a>
-            <a href="/admin/shows" className="block w-full text-center btn-outline-teal text-sm py-2">Manage Shows</a>
-            <a href="/admin/bookings" className="block w-full text-center btn-outline-teal text-sm py-2">View Bookings</a>
+            <Link href="/admin/movies" className="block w-full text-center btn-outline-teal text-sm py-2">Manage Movies</Link>
+            <Link href="/admin/shows" className="block w-full text-center btn-outline-teal text-sm py-2">Manage Shows</Link>
+            <Link href="/admin/bookings" className="block w-full text-center btn-outline-teal text-sm py-2">View Bookings</Link>
           </div>
         </div>
       </div>
