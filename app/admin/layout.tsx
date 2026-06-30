@@ -5,7 +5,7 @@ import { useAuth } from "@/context/auth-context";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, Film, Clapperboard, Monitor, Ticket, BarChart3, ChevronLeft
+  LayoutDashboard, Film, Clapperboard, Monitor, Ticket, BarChart3, Settings, ChevronLeft
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +16,7 @@ const sidebarLinks = [
   { href: "/admin/screens", label: "Screens", icon: Monitor },
   { href: "/admin/bookings", label: "Bookings", icon: Ticket },
   { href: "/admin/reports", label: "Reports", icon: BarChart3 },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

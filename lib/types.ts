@@ -90,6 +90,11 @@ export interface Booking {
   createdAt: string;
 }
 
+export interface Setting {
+  key: string;
+  value: string;
+}
+
 export interface Payment {
   id: string;
   bookingId: string;

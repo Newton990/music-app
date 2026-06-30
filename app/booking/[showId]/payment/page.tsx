@@ -22,10 +22,6 @@ function PaymentContent({ showId }: { showId: string }) {
   const [loading, setLoading] = useState(true);
   const [method, setMethod] = useState<PaymentMethod>("mpesa");
   const [phone, setPhone] = useState("07");
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardName, setCardName] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvv, setCvv] = useState("");
   const [payState, setPayState] = useState<PaymentState>("idle");
   const [txRef, setTxRef] = useState("");
 
@@ -56,8 +52,23 @@ function PaymentContent({ showId }: { showId: string }) {
     if (method === "mpesa" && phone.replace(/\s/g, "").length < 9) {
       toast.error("Enter a valid phone number"); return;
     }
-    if (method === "card" && (cardNumber.length < 16 || !cardName || !expiry || !cvv)) {
-      toast.error("Fill in all card details"); return;
+
+    setPayState("processing");
+
+    if (method === "card") {
+      const res = await fetch("/api/payments/paystack/initialize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId }),
+      });
+      const json = await res.json();
+      if (json.authorizationUrl) {
+        window.location.href = json.authorizationUrl;
+        return;
+      }
+      setPayState("failed");
+      toast.error(json.error || "Card payment unavailable");
+      return;
     }
 
     setPayState("processing");
@@ -152,14 +163,11 @@ function PaymentContent({ showId }: { showId: string }) {
               </div>
             )}
             {method === "card" && (
-              <div className="space-y-4">
+              <div>
                 <h3 className="font-bold text-white mb-1">Card Payment</h3>
                 <p className="text-slate-400 text-xs mb-4">Visa, Mastercard, or American Express accepted</p>
-                <div><label className="block text-xs text-slate-400 mb-1.5">Card Number</label><input className="input-cinema" placeholder="1234 5678 9012 3456" value={cardNumber} onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, "").slice(0, 16))} maxLength={16} /></div>
-                <div><label className="block text-xs text-slate-400 mb-1.5">Cardholder Name</label><input className="input-cinema" placeholder="FAITH OGUTU" value={cardName} onChange={(e) => setCardName(e.target.value.toUpperCase())} /></div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div><label className="block text-xs text-slate-400 mb-1.5">Expiry Date</label><input className="input-cinema" placeholder="MM/YY" value={expiry} onChange={(e) => setExpiry(e.target.value.slice(0, 5))} maxLength={5} /></div>
-                  <div><label className="block text-xs text-slate-400 mb-1.5">CVV</label><input className="input-cinema" placeholder="123" value={cvv} onChange={(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 3))} type="password" maxLength={3} /></div>
+                <div className="bg-blue-500/5 border border-blue-500/20 rounded-xl p-4 text-xs text-blue-300">
+                  💳 You will be redirected to Paystack's secure checkout page to complete your card payment.
                 </div>
               </div>
             )}

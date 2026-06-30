@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { query, getOne } from "@/lib/db";
 import { initializePayment } from "@/lib/paynecta";
 import { sendTicketEmail } from "@/lib/email";
+import { initializeTransaction as paystackInit } from "@/lib/paystack";
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
@@ -41,7 +42,25 @@ export async function POST(req: Request) {
     }
   }
 
-  // Simulated payment for non-mpesa or when Paynecta key not set
+  if (method === "card") {
+    const paystackSetting = await getOne<any>("SELECT `value` FROM Setting WHERE `key` = 'paystack_secret_key'");
+    const paystackSecret = paystackSetting?.value || process.env.PAYSTACK_SECRET_KEY || "";
+    if (paystackSecret) {
+      const ref = `PS-${Date.now()}`;
+      const callbackUrl = `${process.env.NEXTAUTH_URL || "https://ticketbookings.vercel.app"}/api/payments/paystack/callback?bookingId=${bookingId}`;
+      const result = await paystackInit(session.user.email!, booking.totalAmount, ref, callbackUrl, paystackSecret);
+      if (result.status) {
+        await query(
+          "INSERT INTO Payment (id, bookingId, amount, method, status, transactionRef) VALUES (?,?,?,?,'pending',?)",
+          [`py${Date.now()}`, bookingId, booking.totalAmount, "card", ref]
+        );
+        return NextResponse.json({ success: true, transactionRef: ref, authorizationUrl: result.data.authorization_url });
+      }
+      return NextResponse.json({ error: result.message || "Paystack initialization failed" }, { status: 502 });
+    }
+  }
+
+  // Simulated payment for non-mpesa/card or when payment keys not set
   const ref = `TXN${Date.now()}`;
   await query(
     "INSERT INTO Payment (id, bookingId, amount, method, status, transactionRef, paidAt) VALUES (?,?,?,?,'success',?,NOW())",
