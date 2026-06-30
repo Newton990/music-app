@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     const numRows = Number(rows);
     const numCols = Number(cols);
     await query(
-      "INSERT INTO Screen (id, cinemaId, name, rows, cols) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO Screen (id, cinemaId, name, `rows`, `cols`) VALUES (?, ?, ?, ?, ?)",
       [id, cinemaId, name, numRows, numCols]
     );
 
