@@ -39,17 +39,6 @@ function PaymentContent({ showId }: { showId: string }) {
     }
   }, [bookingId, user, router, showId]);
 
-  if (loading) return <div className="pt-24 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" /></div>;
-  if (!booking) {
-    return (
-      <div className="pt-24 text-center text-slate-400">
-        <p className="text-5xl mb-4">⚠️</p>
-        <p>Booking not found. Please start again.</p>
-        <button onClick={() => router.push("/movies")} className="btn-teal mt-4">Browse Movies</button>
-      </div>
-    );
-  }
-
   useEffect(() => {
     if (payState !== "pending") return;
     if (pollCount >= POLL_LIMIT) {
@@ -78,6 +67,17 @@ function PaymentContent({ showId }: { showId: string }) {
     }, 3000);
     return () => clearTimeout(timer);
   }, [payState, pollCount, bookingId, router]);
+
+  if (loading) return <div className="pt-24 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" /></div>;
+  if (!booking) {
+    return (
+      <div className="pt-24 text-center text-slate-400">
+        <p className="text-5xl mb-4">⚠️</p>
+        <p>Booking not found. Please start again.</p>
+        <button onClick={() => router.push("/movies")} className="btn-teal mt-4">Browse Movies</button>
+      </div>
+    );
+  }
 
   const handlePay = async () => {
     if (method === "mpesa" && phone.replace(/\s/g, "").length < 9) {
