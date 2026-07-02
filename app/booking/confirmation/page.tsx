@@ -14,27 +14,27 @@ function ConfirmationContent() {
 
   useEffect(() => {
     if (bookingId) {
-      fetch(`/api/bookings/${bookingId}`).then(r => r.json()).then(data => { setBooking(data); setLoading(false); });
+      fetch(`/api/bookings/${bookingId}`)
+        .then(r => r.json())
+        .then(data => { setBooking(data); setLoading(false); })
+        .catch(() => setLoading(false));
     } else {
       setLoading(false);
     }
   }, [bookingId]);
 
-  if (loading) return <div className="pt-24 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return <div className="pt-24 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>;
   if (!booking) {
     return (
       <div className="pt-24 text-center">
         <p className="text-slate-400">Booking not found.</p>
-        <button onClick={() => router.push("/")} className="btn-teal mt-4">Go Home</button>
+        <button onClick={() => router.push("/")} className="btn-gold mt-4">Go Home</button>
       </div>
     );
   }
 
-  const seats = typeof booking.seats === "string" ? JSON.parse(booking.seats) : booking.seats;
-  const seatLabels = seats.map((s: any) => s.seatId.split("-").slice(-1)[0]);
-
-  // Generate simulated QR code
-  const qrData = booking.qrCode || `BK-${bookingId}`;
+  const seats = typeof booking.seats === "string" ? JSON.parse(booking.seats) : (booking.seats ?? []);
+  const qrData = booking.qrCode || bookingId;
   const qrChars = qrData.split("").map((c: string) => c.charCodeAt(0));
 
   return (
@@ -44,20 +44,20 @@ function ConfirmationContent() {
           <CheckCircle className="w-10 h-10 text-green-400" />
         </div>
         <h1 className="text-3xl font-black text-white mb-2">Booking Confirmed!</h1>
-        <p className="text-slate-400">Your tickets have been booked successfully.</p>
+        <p className="text-slate-400">Your tickets are ready. Enjoy the show! 🎬</p>
       </div>
 
       <div className="card-cinema p-6 mb-6 animate-slide-up">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-white">Your Ticket</h2>
           <span className="text-xs bg-green-500/20 text-green-400 px-3 py-1 rounded-full font-semibold">
-            {booking.status === "confirmed" ? "Paid" : booking.status}
+            ✓ Paid
           </span>
         </div>
 
         <div className="bg-cinema-bg rounded-xl p-5 border border-cinema-border mb-4">
           <div className="flex items-center gap-3 mb-4">
-            <Ticket className="w-5 h-5 text-teal-400" />
+            <Ticket className="w-5 h-5 text-amber-400" />
             <div>
               <p className="text-lg font-bold text-white">{booking.movieTitle}</p>
               <p className="text-xs text-slate-400">{booking.cinemaName} · {booking.screenName}</p>
@@ -66,14 +66,14 @@ function ConfirmationContent() {
 
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-teal-400 shrink-0" />
+              <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
               <div>
                 <p className="text-xs text-slate-500">Date</p>
                 <p className="text-sm text-white font-semibold">{formatDate(booking.startTime)}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-teal-400 shrink-0" />
+              <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
               <div>
                 <p className="text-xs text-slate-500">Time</p>
                 <p className="text-sm text-white font-semibold">{formatTime(booking.startTime)}</p>
@@ -82,9 +82,9 @@ function ConfirmationContent() {
           </div>
 
           <div className="flex items-center gap-2 mb-4">
-            <MapPin className="w-4 h-4 text-teal-400 shrink-0" />
+            <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
             <div>
-              <p className="text-xs text-slate-500">Location</p>
+              <p className="text-xs text-slate-500">Cinema</p>
               <p className="text-sm text-white font-semibold">{booking.cinemaName}</p>
             </div>
           </div>
@@ -93,43 +93,49 @@ function ConfirmationContent() {
             <p className="text-xs text-slate-500 mb-2">Seats</p>
             <div className="flex flex-wrap gap-2">
               {seats.map((s: any) => (
-                <span key={s.seatId} className="px-3 py-1.5 bg-teal-500/10 border border-teal-500/30 rounded-lg text-sm font-bold text-teal-400">{s.seatId.split("-").slice(-1)[0]}</span>
+                <span key={s.seatId} className="px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-sm font-bold text-amber-400">
+                  {s.seatId.split("-").slice(-1)[0]}
+                </span>
               ))}
             </div>
           </div>
         </div>
 
+        {/* QR Code */}
         <div className="flex justify-center mb-4">
-          <div className="bg-white p-3 rounded-xl">
+          <div className="bg-white p-4 rounded-xl shadow-lg">
             <div className="grid grid-cols-8 gap-0.5">
               {Array.from({ length: 64 }).map((_, i) => (
-                <div key={i} className={`w-2 h-2 rounded-sm ${qrChars[i % qrChars.length] % 3 === 0 ? "bg-black" : "bg-gray-200"}`} />
+                <div key={i} className={`w-2.5 h-2.5 rounded-sm ${qrChars[i % qrChars.length] % 3 === 0 ? "bg-black" : "bg-gray-200"}`} />
               ))}
             </div>
           </div>
         </div>
-
         <div className="text-center mb-4">
           <p className="text-xs text-slate-500 font-mono">{qrData}</p>
+          <p className="text-xs text-slate-600 mt-1">Show this at the cinema entrance</p>
         </div>
 
         <div className="flex justify-between items-center border-t border-cinema-border pt-4">
           <div>
             <p className="text-xs text-slate-500">Total Paid</p>
-            <p className="text-xl font-black text-teal-400">{formatCurrency(booking.totalAmount)}</p>
+            <p className="text-xl font-black text-amber-400">{formatCurrency(booking.totalAmount)}</p>
           </div>
           {booking.transactionRef && (
             <div className="text-right">
-              <p className="text-xs text-slate-500">Ref</p>
-              <p className="text-xs text-slate-300 font-mono">{booking.transactionRef}</p>
+              <p className="text-xs text-slate-500">Payment Ref</p>
+              <p className="text-xs text-green-400 font-mono">✅ {booking.transactionRef}</p>
             </div>
           )}
         </div>
       </div>
 
       <div className="flex flex-col gap-3">
-        <Link href="/dashboard" className="btn-teal flex items-center justify-center gap-2 py-4">
+        <Link href="/dashboard" className="btn-gold flex items-center justify-center gap-2 py-4">
           <Home className="w-4 h-4" /> Go to Dashboard
+        </Link>
+        <Link href="/movies" className="btn-outline-gold flex items-center justify-center gap-2 py-3 text-sm">
+          Browse More Movies
         </Link>
       </div>
     </div>
@@ -138,7 +144,7 @@ function ConfirmationContent() {
 
 export default function ConfirmationPage() {
   return (
-    <Suspense fallback={<div className="pt-24 text-center text-slate-400">Loading...</div>}>
+    <Suspense fallback={<div className="pt-24 text-center text-slate-400">Loading your ticket...</div>}>
       <ConfirmationContent />
     </Suspense>
   );

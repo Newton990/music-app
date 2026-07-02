@@ -36,7 +36,7 @@ export default function SeatSelectionPage({ params }: { params: { showId: string
     return () => { cancelled = true; };
   }, [showId]);
 
-  if (loading) return <div className="pt-24 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return <div className="pt-24 min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>;
   if (!show) return <div className="pt-24 text-center text-slate-400">Show not found</div>;
 
   const rows = Array.from(new Set(seats.map((s: any) => s.row))).sort();
@@ -82,7 +82,7 @@ export default function SeatSelectionPage({ params }: { params: { showId: string
       selectedSeats: selectedSeats.map((seat) => ({ seatId: seat.id, price: getSeatPrice(seat.type) })),
       totalAmount: total,
     });
-    if (!result) { toast.error("Failed to create booking"); return; }
+    if (!result) { toast.error("Failed to create booking. A selected seat may already be taken."); return; }
     router.push(`/booking/${showId}/payment?bookingId=${result.id}`);
   };
 
@@ -97,17 +97,17 @@ export default function SeatSelectionPage({ params }: { params: { showId: string
           <div>
             <h1 className="text-xl font-bold text-white">{show.movieTitle}</h1>
             <p className="text-slate-400 text-sm">{show.cinemaName} · {show.screenName}</p>
-            <p className="text-teal-400 font-semibold text-sm mt-1">{formatDate(show.startTime)} at {formatTime(show.startTime)}</p>
+            <p className="text-amber-400 font-semibold text-sm mt-1">{formatDate(show.startTime)} at {formatTime(show.startTime)}</p>
           </div>
           <div className="text-right">
             <p className="text-xs text-slate-500">Selected</p>
-            <p className="text-2xl font-black text-teal-400">{selectedSeats.length}</p>
+            <p className="text-2xl font-black text-amber-400">{selectedSeats.length}</p>
             <p className="text-xs text-slate-400">seat{selectedSeats.length !== 1 ? "s" : ""}</p>
           </div>
         </div>
 
         <div className="text-center mb-8">
-          <div className="inline-block w-3/4 max-w-sm h-3 rounded-t-full bg-gradient-to-r from-transparent via-teal-500/50 to-transparent mb-2" />
+          <div className="inline-block w-3/4 max-w-sm h-3 rounded-t-full bg-gradient-to-r from-transparent via-amber-500/50 to-transparent mb-2" />
           <p className="text-xs text-slate-500 uppercase tracking-widest">SCREEN</p>
         </div>
 
@@ -157,8 +157,8 @@ export default function SeatSelectionPage({ params }: { params: { showId: string
             <h3 className="font-bold text-white mb-3">Selected Seats</h3>
             <div className="flex flex-wrap gap-2 mb-4">
               {selectedSeats.map((seat) => (
-                <div key={seat.id} className="flex items-center gap-1 px-3 py-1.5 bg-teal-500/10 border border-teal-500/30 rounded-lg">
-                  <span className="text-teal-400 font-bold text-sm">{seat.row}{seat.col}</span>
+                <div key={seat.id} className="flex items-center gap-1 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                  <span className="text-amber-400 font-bold text-sm">{seat.row}{seat.col}</span>
                   <span className="text-slate-400 text-xs capitalize">({seat.type})</span>
                   <button onClick={() => toggleSeat(seat)} className="text-slate-500 hover:text-red-400 ml-1 transition-colors text-xs">✕</button>
                 </div>
@@ -166,13 +166,13 @@ export default function SeatSelectionPage({ params }: { params: { showId: string
             </div>
             <div className="flex items-center justify-between pt-3 border-t border-cinema-border">
               <span className="text-slate-400">Total Amount</span>
-              <span className="text-2xl font-black text-teal-400">{formatCurrency(total)}</span>
+              <span className="text-2xl font-black text-amber-400">{formatCurrency(total)}</span>
             </div>
           </div>
         )}
 
         <div className="flex gap-3">
-          <button onClick={handleContinue} disabled={selectedSeats.length === 0} className="btn-teal flex-1 py-4 text-base">
+          <button onClick={handleContinue} disabled={selectedSeats.length === 0} className="btn-gold flex-1 py-4 text-base disabled:opacity-40 disabled:cursor-not-allowed">
             Continue to Payment
           </button>
         </div>

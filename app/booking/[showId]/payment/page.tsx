@@ -111,7 +111,7 @@ function PaymentContent({ showId }: { showId: string }) {
       return;
     }
 
-    // M-Pesa: start polling for confirmation
+    // M-Pesa/Wallet: start polling for confirmation
     setPayState("pending");
     setPollCount(0);
   };

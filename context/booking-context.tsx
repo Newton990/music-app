@@ -47,7 +47,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       if (json.transactionRef) {
         setBookings((prev) => prev.map((b) => (b.id === bookingId ? { ...b, status: "confirmed" } : b)));
       }
-      return { success: true, ref: json.transactionRef };
+      return { success: json.success ?? true, ref: json.transactionRef ?? "" };
     } catch {
       return { success: false, ref: "" };
     }
